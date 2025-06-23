@@ -38,12 +38,12 @@ const requireExco = (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {
       const { email, password, displayName } = req.body;
-      
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -52,7 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Hash password
       const passwordHash = await bcrypt.hash(password, 10);
-      
+
       // Create user
       const userData = insertUserSchema.parse({
         email,
@@ -60,12 +60,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         displayName,
         role: "member"
       });
-      
+
       const user = await storage.createUser(userData);
-      
+
       // Generate JWT
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-      
+
       res.json({ 
         token, 
         user: { 
@@ -83,7 +83,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
-      
+
       // Find user
       const user = await storage.getUserByEmail(email);
       if (!user) {
@@ -98,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate JWT
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-      
+
       res.json({ 
         token, 
         user: { 
@@ -136,7 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/users", authenticateToken, requireExco, async (req, res) => {
     try {
       const { email, displayName, role = "member" } = req.body;
-      
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -146,16 +146,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate a temporary password for new users
       const tempPassword = Math.random().toString(36).slice(-8);
       const passwordHash = await bcrypt.hash(tempPassword, 10);
-      
+
       const userData = insertUserSchema.parse({
         email,
         passwordHash,
         displayName,
         role
       });
-      
+
       const user = await storage.createUser(userData);
-      
+
       res.json({ 
         user: { 
           id: user.id, 
@@ -220,13 +220,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         userId: user.id
       });
-      
+
       // Check if user already submitted reflection for this meeting
       const existing = await storage.getUserReflection(user.id, reflectionData.meetingId);
       if (existing) {
         return res.status(400).json({ message: "Reflection already submitted for this meeting" });
       }
-      
+
       const reflection = await storage.createReflection(reflectionData);
       res.json(reflection);
     } catch (error) {

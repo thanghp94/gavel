@@ -43,18 +43,8 @@ const ExcoUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/users', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      
-      if (response.ok) {
-        const usersData = await response.json();
-        setUsers(usersData);
-      } else {
-        throw new Error('Failed to fetch users');
-      }
+      const usersData = await api.getUsers();
+      setUsers(usersData);
     } catch (error) {
       console.error('Failed to fetch users:', error);
       toast({
@@ -79,28 +69,14 @@ const ExcoUsers = () => {
 
     setIsCreating(true);
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(newUser),
+      const data = await api.createUser(newUser);
+      toast({
+        title: "User Created",
+        description: `User created successfully. Temporary password: ${data.tempPassword}`,
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        toast({
-          title: "User Created",
-          description: `User created successfully. Temporary password: ${data.tempPassword}`,
-        });
-        setIsAddDialogOpen(false);
-        setNewUser({ email: "", displayName: "", role: "member" });
-        fetchUsers(); // Refresh the users list
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create user');
-      }
+      setIsAddDialogOpen(false);
+      setNewUser({ email: "", displayName: "", role: "member" });
+      fetchUsers(); // Refresh the users list
     } catch (error) {
       console.error('Failed to create user:', error);
       toast({

@@ -110,6 +110,18 @@ class ApiClient {
     });
   }
 
+  // User management methods
+  async getUsers() {
+    return this.request<any[]>('/users');
+  }
+
+  async createUser(userData: { email: string; displayName: string; role: string }) {
+    return this.request<any>('/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  }
+
   logout() {
     localStorage.removeItem('authToken');
   }
