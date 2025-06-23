@@ -44,10 +44,6 @@ const ExcoUsers = () => {
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -62,6 +58,42 @@ const ExcoUsers = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    try {
+      await api.updateUserRole(userId, newRole);
+      toast({
+        title: "Success",
+        description: "User role updated successfully",
+      });
+      fetchUsers(); // Refresh the list
+    } catch (error) {
+      console.error('Failed to update user role:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update user role",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleUserStatus = async (userId: string, isActive: boolean) => {
+    try {
+      await api.updateUserStatus(userId, isActive);
+      toast({
+        title: "Success",
+        description: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
+      });
+      fetchUsers(); // Refresh the list
+    } catch (error) {
+      console.error('Failed to update user status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update user status",
+        variant: "destructive",
+      });
     }
   };
 
@@ -97,23 +129,6 @@ const ExcoUsers = () => {
     }
   };
 
-  const handleUpdateUserRole = async (userId: string, newRole: string) => {
-    try {
-      await api.updateUserRole(userId, newRole);
-      await fetchUsers();
-      toast({
-        title: "Success",
-        description: "User role updated successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update user role",
-        variant: "destructive",
-      });
-    }
-  };
-
   const filteredUsers = users.filter(user =>
     user.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -129,6 +144,10 @@ const ExcoUsers = () => {
         return 'secondary';
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">

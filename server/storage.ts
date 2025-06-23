@@ -33,7 +33,16 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUsers(): Promise<any[]>;
-  createUser(user: InsertUser): Promise<User>;
+  createUser(user: {
+    email: string;
+    passwordHash: string;
+    displayName: string;
+    fullName: string;
+    dateOfBirth?: string;
+    school?: string;
+    gender?: string;
+    role?: string;
+  }): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User | undefined>;
 
   // Meeting methods
@@ -70,8 +79,26 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
-  async createUser(user: InsertUser): Promise<User> {
-    const result = await db.insert(users).values(user).returning();
+  async createUser(userData: {
+    email: string;
+    passwordHash: string;
+    displayName: string;
+    fullName: string;
+    dateOfBirth?: string;
+    school?: string;
+    gender?: string;
+    role?: string;
+  }) {
+    const result = await db.insert(users).values({
+      email: userData.email,
+      passwordHash: userData.passwordHash,
+      displayName: userData.displayName,
+      fullName: userData.fullName,
+      dateOfBirth: userData.dateOfBirth,
+      school: userData.school,
+      gender: userData.gender,
+      role: userData.role || 'member',
+    }).returning();
     return result[0];
   }
 
