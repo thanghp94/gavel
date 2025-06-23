@@ -133,6 +133,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/users", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const { email, displayName, role = "member" } = req.body;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Generate a temporary password for new users
+      const tempPassword = Math.random().toString(36).slice(-8);
+      const passwordHash = await bcrypt.hash(tempPassword, 10);
+      
+      const userData = insertUserSchema.parse({
+        email,
+        passwordHash,
+        displayName,
+        role
+      });
+      
+      const user = await storage.createUser(userData);
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          email: user.email, 
+          displayName: user.displayName, 
+          role: user.role 
+        },
+        tempPassword 
+      });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create user" });
+    }
+  });
+
   // Meeting routes
   app.get("/api/meetings", authenticateToken, async (req, res) => {
     try {
