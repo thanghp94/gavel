@@ -34,22 +34,22 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User | undefined>;
-  
+
   // Meeting methods
   getMeetings(): Promise<Meeting[]>;
   getMeeting(id: string): Promise<Meeting | undefined>;
   createMeeting(meeting: InsertMeeting): Promise<Meeting>;
   updateMeeting(id: string, updates: Partial<InsertMeeting>): Promise<Meeting | undefined>;
-  
+
   // Role methods
   getRoles(): Promise<Role[]>;
   getRole(id: string): Promise<Role | undefined>;
-  
+
   // Reflection methods
   getReflections(meetingId: string): Promise<Reflection[]>;
   createReflection(reflection: InsertReflection): Promise<Reflection>;
   getUserReflection(userId: string, meetingId: string): Promise<Reflection | undefined>;
-  
+
   // Content page methods
   getContentPages(): Promise<ContentPage[]>;
   getContentPageBySlug(slug: string): Promise<ContentPage | undefined>;
@@ -144,6 +144,18 @@ export class DatabaseStorage implements IStorage {
   async updateContentPage(id: string, updates: Partial<ContentPage>): Promise<ContentPage | undefined> {
     const result = await db.update(contentPages).set(updates).where(eq(contentPages.id, id)).returning();
     return result[0];
+  }
+
+  async getUsers() {
+    return await this.db.select({
+      id: users.id,
+      email: users.email,
+      displayName: users.displayName,
+      role: users.role,
+      isActive: users.isActive,
+      createdAt: users.createdAt,
+      lastLogin: users.lastLogin
+    }).from(users).orderBy(users.createdAt);
   }
 }
 

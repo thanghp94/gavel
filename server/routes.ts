@@ -124,6 +124,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  app.get("/api/users", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   // Meeting routes
   app.get("/api/meetings", authenticateToken, async (req, res) => {
     try {
