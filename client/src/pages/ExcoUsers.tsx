@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,10 @@ interface User {
   id: string;
   email: string;
   displayName: string;
+  fullName: string;
+  dateOfBirth: string;
+  school: string;
+  gender: string;
   role: string;
   isActive: boolean;
   createdAt: string;
@@ -31,8 +34,13 @@ const ExcoUsers = () => {
   const [newUser, setNewUser] = useState({
     email: "",
     displayName: "",
-    role: "member"
+    fullName: "",
+    dateOfBirth: "",
+    school: "",
+    gender: "",
+    role: "member",
   });
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
@@ -75,7 +83,7 @@ const ExcoUsers = () => {
         description: `User created successfully. Temporary password: ${data.tempPassword}`,
       });
       setIsAddDialogOpen(false);
-      setNewUser({ email: "", displayName: "", role: "member" });
+      setNewUser({ email: "", displayName: "", fullName: "", dateOfBirth: "", school: "", gender: "", role: "member" });
       fetchUsers(); // Refresh the users list
     } catch (error) {
       console.error('Failed to create user:', error);
@@ -86,6 +94,23 @@ const ExcoUsers = () => {
       });
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleUpdateUserRole = async (userId: string, newRole: string) => {
+    try {
+      await api.updateUserRole(userId, newRole);
+      await fetchUsers();
+      toast({
+        title: "Success",
+        description: "User role updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update user role",
+        variant: "destructive",
+      });
     }
   };
 
@@ -108,7 +133,7 @@ const ExcoUsers = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <ExcoNavigation />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -132,7 +157,7 @@ const ExcoUsers = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -146,7 +171,7 @@ const ExcoUsers = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -208,6 +233,46 @@ const ExcoUsers = () => {
                             placeholder="John Doe"
                           />
                         </div>
+                         <div>
+                          <Label htmlFor="fullName">Full Name</Label>
+                          <Input
+                            id="fullName"
+                            value={newUser.fullName}
+                            onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
+                            placeholder="John Doe"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                          <Input
+                            id="dateOfBirth"
+                            type="date"
+                            value={newUser.dateOfBirth}
+                            onChange={(e) => setNewUser({ ...newUser, dateOfBirth: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="school">School</Label>
+                          <Input
+                            id="school"
+                            value={newUser.school}
+                            onChange={(e) => setNewUser({ ...newUser, school: e.target.value })}
+                            placeholder="University Name"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="gender">Gender</Label>
+                          <Select value={newUser.gender} onValueChange={(value) => setNewUser({ ...newUser, gender: value })}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div>
                           <Label htmlFor="role">Role</Label>
                           <Select value={newUser.role} onValueChange={(value) => setNewUser({ ...newUser, role: value })}>
@@ -249,42 +314,50 @@ const ExcoUsers = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
+                      <TableHead>Display Name</TableHead>
+                      <TableHead>Full Name</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead>School</TableHead>
+                      <TableHead>Gender</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Joined</TableHead>
-                      <TableHead>Last Login</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUsers.map((user) => (
+                    {users.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">{user.displayName}</TableCell>
+                        <TableCell>{user.fullName}</TableCell>
                         <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.school || '-'}</TableCell>
+                        <TableCell>{user.gender || '-'}</TableCell>
                         <TableCell>
-                          <Badge variant={getRoleBadgeVariant(user.role)}>
-                            {user.role.toUpperCase()}
+                          <Select 
+                            value={user.role} 
+                            onValueChange={(newRole) => handleUpdateUserRole(user.id, newRole)}
+                          >
+                            <SelectTrigger className="w-24">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="member">Member</SelectItem>
+                              <SelectItem value="exco">ExCo</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={user.isActive ? 'default' : 'destructive'}>
+                            {user.isActive ? 'Active' : 'Inactive'}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={user.isActive ? "default" : "secondary"}>
-                            {user.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(user.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          {user.lastLogin 
-                            ? new Date(user.lastLogin).toLocaleDateString()
-                            : "Never"
-                          }
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="outline" size="sm">
-                            Edit
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingUser(user)}
+                          >
+                            View Details
                           </Button>
                         </TableCell>
                       </TableRow>

@@ -115,10 +115,17 @@ class ApiClient {
     return this.request<any[]>('/users');
   }
 
-  async createUser(userData: { email: string; displayName: string; role: string }) {
+  async createUser(userData: any) {
     return this.request<any>('/users', {
       method: 'POST',
       body: JSON.stringify(userData),
+    });
+  }
+
+  async updateUserRole(userId: string, role: string) {
+    return this.request<any>(`/users/${userId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify({ role }),
     });
   }
 

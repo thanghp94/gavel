@@ -42,7 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { email, password, displayName } = req.body;
+      const { email, password, displayName, fullName, dateOfBirth, school, gender } = req.body;
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -58,6 +58,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         passwordHash,
         displayName,
+        fullName,
+        dateOfBirth: dateOfBirth || null,
+        school: school || null,
+        gender: gender || null,
         role: "member"
       });
 
@@ -71,7 +75,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: { 
           id: user.id, 
           email: user.email, 
-          displayName: user.displayName, 
+          displayName: user.displayName,
+          fullName: user.fullName,
           role: user.role 
         } 
       });
@@ -135,7 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/users", authenticateToken, requireExco, async (req, res) => {
     try {
-      const { email, displayName, role = "member" } = req.body;
+      const { email, displayName, fullName, school, gender, role = "member" } = req.body;
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -151,6 +156,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         passwordHash,
         displayName,
+        fullName: fullName || displayName,
+        school: school || null,
+        gender: gender || null,
         role
       });
 
@@ -160,13 +168,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: { 
           id: user.id, 
           email: user.email, 
-          displayName: user.displayName, 
+          displayName: user.displayName,
+          fullName: user.fullName,
           role: user.role 
         },
         tempPassword 
       });
     } catch (error) {
       res.status(400).json({ message: "Failed to create user" });
+    }
+  });
+
+  app.put("/api/users/:id/role", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const { role } = req.body;
+      const userId = req.params.id;
+
+      const updatedUser = await storage.updateUserRole(userId, role);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({ 
+        user: { 
+          id: updatedUser.id, 
+          email: updatedUser.email, 
+          displayName: updatedUser.displayName,
+          fullName: updatedUser.fullName,
+          role: updatedUser.role 
+        }
+      });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update user role" });
     }
   });
 
