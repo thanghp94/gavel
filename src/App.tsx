@@ -12,6 +12,8 @@ import MemberProgress from "./pages/MemberProgress";
 import MemberReflections from "./pages/MemberReflections";
 import ExcoDashboard from "./pages/ExcoDashboard";
 import MemberReflection from "./pages/MemberReflection";
+import AdminMeetings from "./pages/AdminMeetings";
+import AdminContent from "./pages/AdminContent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/member/reflections" element={<MemberReflections />} />
           <Route path="/member/reflection/:meetingId" element={<MemberReflection />} />
           <Route path="/exco/dashboard" element={<ExcoDashboard />} />
+          <Route path="/exco/meetings" element={<AdminMeetings />} />
+          <Route path="/exco/content" element={<AdminContent />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

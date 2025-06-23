@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -22,13 +21,13 @@ export const ExcoNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigationItems = [
-    { icon: Home, label: "Dashboard", href: "/exco/dashboard", active: true },
-    { icon: Users, label: "Members", href: "/exco/users" },
-    { icon: Calendar, label: "Meetings", href: "/exco/meetings" },
-    { icon: BookOpen, label: "Roles & Content", href: "/exco/roles" },
-    { icon: Globe, label: "Public Pages", href: "/exco/cms" },
-    { icon: FileText, label: "Tasks", href: "/exco/tasks" },
-    { icon: TrendingUp, label: "Analytics", href: "/exco/analytics" }
+    { icon: Home, label: "Dashboard", href: "/exco/dashboard", active: window.location.pathname === "/exco/dashboard" },
+    { icon: Users, label: "Members", href: "/exco/users", active: window.location.pathname === "/exco/users" },
+    { icon: Calendar, label: "Meetings", href: "/exco/meetings", active: window.location.pathname === "/exco/meetings" },
+    { icon: BookOpen, label: "Content", href: "/exco/content", active: window.location.pathname === "/exco/content" },
+    { icon: Globe, label: "Public Pages", href: "/exco/cms", active: window.location.pathname === "/exco/cms" },
+    { icon: FileText, label: "Tasks", href: "/exco/tasks", active: window.location.pathname === "/exco/tasks" },
+    { icon: TrendingUp, label: "Analytics", href: "/exco/analytics", active: window.location.pathname === "/exco/analytics" }
   ];
 
   const NavItems = ({ mobile = false }) => (
