@@ -1,55 +1,52 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, BookOpen, TrendingUp, MessageSquare, User, Clock, Award } from "lucide-react";
 import { MemberNavigation } from "@/components/navigation/MemberNavigation";
+import { api } from "@/lib/api";
 
 const MemberDashboard = () => {
-  const [memberData] = useState({
-    name: "John Doe",
-    role: "Active Member",
-    joinDate: "March 2024",
-    speechesCompleted: 5,
-    rolesPlayed: 12,
-    attendanceRate: 85
-  });
+  const [memberData, setMemberData] = useState(null);
+  const [upcomingMeetings, setUpcomingMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const upcomingMeetings = [
-    {
-      id: 1,
-      title: "Weekly Meeting #24",
-      date: "June 25, 2024",
-      time: "7:00 PM",
-      role: "Table Topics Master",
-      theme: "Innovation in Communication"
-    },
-    {
-      id: 2,
-      title: "Monthly Evaluation",
-      date: "June 30, 2024",
-      time: "6:30 PM",
-      role: "General Evaluator",
-      theme: "Constructive Feedback"
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [user, meetings] = await Promise.all([
+          api.getCurrentUser(),
+          api.getMeetings()
+        ]);
+        
+        setMemberData(user);
+        // Filter upcoming meetings and limit to 2
+        const upcoming = meetings
+          .filter(m => m.status === 'upcoming')
+          .slice(0, 2);
+        setUpcomingMeetings(upcoming);
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const recentReflections = [
-    {
-      id: 1,
-      meetingTitle: "Weekly Meeting #23",
-      date: "June 18, 2024",
-      status: "Completed"
-    },
-    {
-      id: 2,
-      meetingTitle: "Weekly Meeting #22",
-      date: "June 11, 2024",
-      status: "Pending"
-    }
-  ];
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <MemberNavigation />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading dashboard...</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,7 +56,7 @@ const MemberDashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {memberData.name}!
+            Welcome back, {memberData?.displayName || 'Member'}!
           </h1>
           <p className="text-gray-600">
             Here's your progress and upcoming activities in the club.
@@ -74,9 +71,9 @@ const MemberDashboard = () => {
               <Award className="h-4 w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{memberData.speechesCompleted}</div>
+              <div className="text-2xl font-bold">0</div>
               <p className="text-xs text-blue-100">
-                +2 from last month
+                Start your journey
               </p>
             </CardContent>
           </Card>
@@ -87,7 +84,7 @@ const MemberDashboard = () => {
               <User className="h-4 w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{memberData.rolesPlayed}</div>
+              <div className="text-2xl font-bold">0</div>
               <p className="text-xs text-green-100">
                 Diverse experience
               </p>

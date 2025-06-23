@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, asc } from 'drizzle-orm';
 import {
   users,
   meetings,
@@ -81,7 +81,7 @@ export class DatabaseStorage implements IStorage {
 
   // Meeting methods
   async getMeetings(): Promise<Meeting[]> {
-    return await db.select().from(meetings).orderBy(meetings.date);
+    return await db.select().from(meetings).orderBy(asc(meetings.date));
   }
 
   async getMeeting(id: string): Promise<Meeting | undefined> {
@@ -101,7 +101,7 @@ export class DatabaseStorage implements IStorage {
 
   // Role methods
   async getRoles(): Promise<Role[]> {
-    return await db.select().from(roles).orderBy(roles.name);
+    return await db.select().from(roles).orderBy(asc(roles.name));
   }
 
   async getRole(id: string): Promise<Role | undefined> {
@@ -128,7 +128,7 @@ export class DatabaseStorage implements IStorage {
 
   // Content page methods
   async getContentPages(): Promise<ContentPage[]> {
-    return await db.select().from(contentPages).orderBy(contentPages.title);
+    return await db.select().from(contentPages).orderBy(asc(contentPages.title));
   }
 
   async getContentPageBySlug(slug: string): Promise<ContentPage | undefined> {

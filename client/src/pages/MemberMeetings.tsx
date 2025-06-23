@@ -1,47 +1,30 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Users, MessageSquare, Download } from "lucide-react";
 import { MemberNavigation } from "@/components/navigation/MemberNavigation";
+import { api } from "@/lib/api";
 
 const MemberMeetings = () => {
-  const [meetings] = useState([
-    {
-      id: 1,
-      title: "Weekly Meeting #24",
-      date: "June 25, 2024",
-      time: "7:00 PM - 9:00 PM",
-      location: "Main Conference Room",
-      status: "upcoming",
-      role: "Table Topics Master",
-      theme: "Innovation in Communication",
-      attendees: 15
-    },
-    {
-      id: 2,
-      title: "Monthly Evaluation",
-      date: "June 30, 2024",
-      time: "6:30 PM - 8:30 PM",
-      location: "Main Conference Room",
-      status: "upcoming",
-      role: "General Evaluator",
-      theme: "Constructive Feedback",
-      attendees: 18
-    },
-    {
-      id: 3,
-      title: "Weekly Meeting #23",
-      date: "June 18, 2024",
-      time: "7:00 PM - 9:00 PM",
-      location: "Main Conference Room",
-      status: "completed",
-      role: "Timer",
-      theme: "Leadership Excellence",
-      attendees: 16
-    }
-  ]);
+  const [meetings, setMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMeetings = async () => {
+      try {
+        const data = await api.getMeetings();
+        setMeetings(data);
+      } catch (error) {
+        console.error('Failed to fetch meetings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMeetings();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -50,6 +33,17 @@ const MemberMeetings = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <MemberNavigation />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading meetings...</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -80,7 +74,7 @@ const MemberMeetings = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-gray-600">
                       <Calendar className="h-4 w-4" />
-                      <span>{meeting.date}</span>
+                      <span>{new Date(meeting.date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
                       <Clock className="h-4 w-4" />
@@ -94,10 +88,10 @@ const MemberMeetings = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-gray-600">
                       <Users className="h-4 w-4" />
-                      <span>{meeting.attendees} attendees</span>
+                      <span>Club Meeting</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">Your Role:</span>
+                      <span className="text-sm font-medium text-gray-700">Theme:</span>
                       <Badge variant="secondary">{meeting.role}</Badge>
                     </div>
                   </div>

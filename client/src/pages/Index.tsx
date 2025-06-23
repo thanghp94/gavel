@@ -36,9 +36,9 @@ const Index = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <Link to="/member/dashboard">
+                <Link to="/login">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                    Dashboard
+                    Member Login
                   </Button>
                 </Link>
                 <Link to="/member/meetings">
@@ -75,9 +75,9 @@ const Index = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <Link to="/exco/dashboard">
+                <Link to="/login">
                   <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white">
-                    Dashboard
+                    ExCo Login
                   </Button>
                 </Link>
                 <Link to="/exco/meetings">

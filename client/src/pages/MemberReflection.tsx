@@ -28,9 +28,17 @@ const MemberReflection = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await api.createReflection({
+        meetingId,
+        nameInput: formData.name,
+        q1: formData.q1,
+        q2: formData.q2,
+        q3: formData.q3,
+        q4: formData.q4,
+        q5: formData.q5,
+      });
+
       toast({
         title: "Reflection Submitted",
         description: "Thank you for sharing your thoughts! Your reflection has been recorded.",
@@ -38,7 +46,15 @@ const MemberReflection = () => {
       
       // Redirect back to member dashboard
       window.location.href = '/member/dashboard';
-    }, 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit reflection. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

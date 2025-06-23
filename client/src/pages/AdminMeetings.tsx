@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,40 +11,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, Clock, MapPin, Users, Plus, Edit, Trash2, Eye } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
+import { api } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminMeetings = () => {
-  const [meetings, setMeetings] = useState([
-    {
-      id: 1,
-      title: "Weekly Meeting #24",
-      date: "2024-06-25",
-      time: "19:00",
-      location: "Main Conference Room",
-      theme: "Innovation in Communication",
-      status: "upcoming",
-      attendees: 15,
-      roles: {
-        toastmaster: "John Doe",
-        tableTopicsMaster: "Jane Smith",
-        generalEvaluator: "Bob Johnson"
-      }
-    },
-    {
-      id: 2,
-      title: "Monthly Evaluation",
-      date: "2024-06-30",
-      time: "18:30",
-      location: "Main Conference Room",
-      theme: "Constructive Feedback",
-      status: "upcoming",
-      attendees: 18,
-      roles: {
-        toastmaster: "Alice Brown",
-        tableTopicsMaster: "Charlie Wilson",
-        generalEvaluator: "Diana Davis"
-      }
-    }
-  ]);
+  const [meetings, setMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newMeeting, setNewMeeting] = useState({
@@ -56,28 +29,50 @@ const AdminMeetings = () => {
     description: ""
   });
 
-  const handleAddMeeting = () => {
-    const meeting = {
-      id: meetings.length + 1,
-      ...newMeeting,
-      status: "upcoming",
-      attendees: 0,
-      roles: {
-        toastmaster: "",
-        tableTopicsMaster: "",
-        generalEvaluator: ""
+  useEffect(() => {
+    const fetchMeetings = async () => {
+      try {
+        const data = await api.getMeetings();
+        setMeetings(data);
+      } catch (error) {
+        console.error('Failed to fetch meetings:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load meetings",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
       }
     };
-    setMeetings([...meetings, meeting]);
-    setNewMeeting({
-      title: "",
-      date: "",
-      time: "",
-      location: "",
-      theme: "",
-      description: ""
-    });
-    setIsAddDialogOpen(false);
+
+    fetchMeetings();
+  }, []);
+
+  const handleAddMeeting = async () => {
+    try {
+      const meeting = await api.createMeeting(newMeeting);
+      setMeetings([...meetings, meeting]);
+      setNewMeeting({
+        title: "",
+        date: "",
+        time: "",
+        location: "",
+        theme: "",
+        description: ""
+      });
+      setIsAddDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Meeting created successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create meeting",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
