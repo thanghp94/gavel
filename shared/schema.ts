@@ -1,17 +1,129 @@
-import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { pgTable, text, uuid, boolean, timestamp, time, date, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Users table
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  displayName: varchar("display_name", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }).notNull().default("member"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  lastLogin: timestamp("last_login", { withTimezone: true }),
+  isActive: boolean("is_active").default(true),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+// Meetings table
+export const meetings = pgTable("meetings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: varchar("title", { length: 255 }).notNull(),
+  date: date("date").notNull(),
+  time: time("time").notNull(),
+  theme: varchar("theme", { length: 255 }),
+  location: varchar("location", { length: 255 }),
+  status: varchar("status", { length: 50 }).default("upcoming"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// Roles table (master list)
+export const roles = pgTable("roles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Role content table (scripts/guidelines)
+export const roleContent = pgTable("role_content", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  roleId: uuid("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  language: varchar("language", { length: 10 }).default("en"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Meeting roles table (junction table)
+export const meetingRoles = pgTable("meeting_roles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  meetingId: uuid("meeting_id").notNull().references(() => meetings.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  roleId: uuid("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
+  speechTitle: varchar("speech_title", { length: 255 }),
+  speechObjectives: text("speech_objectives"),
+});
+
+// Attendance table
+export const attendance = pgTable("attendance", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  meetingId: uuid("meeting_id").notNull().references(() => meetings.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  attended: boolean("attended").notNull().default(false),
+  recordedAt: timestamp("recorded_at", { withTimezone: true }).defaultNow(),
+});
+
+// Reflections table
+export const reflections = pgTable("reflections", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  meetingId: uuid("meeting_id").notNull().references(() => meetings.id, { onDelete: "cascade" }),
+  nameInput: varchar("name_input", { length: 255 }).notNull(),
+  q1: text("q1").notNull(),
+  q2: text("q2").notNull(),
+  q3: text("q3").notNull(),
+  q4: text("q4").notNull(),
+  q5: text("q5").notNull(),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }).defaultNow(),
+});
+
+// Content pages table (CMS)
+export const contentPages = pgTable("content_pages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Learning materials table
+export const learningMaterials = pgTable("learning_materials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  content: text("content"),
+  materialType: varchar("material_type", { length: 50 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Schemas for validation
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  lastLogin: true,
+});
+
+export const selectUserSchema = createSelectSchema(users);
+
+export const insertMeetingSchema = createInsertSchema(meetings).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertReflectionSchema = createInsertSchema(reflections).omit({
+  id: true,
+  submittedAt: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type Meeting = typeof meetings.$inferSelect;
+export type InsertMeeting = z.infer<typeof insertMeetingSchema>;
+export type Role = typeof roles.$inferSelect;
+export type Reflection = typeof reflections.$inferSelect;
+export type InsertReflection = z.infer<typeof insertReflectionSchema>;
+export type ContentPage = typeof contentPages.$inferSelect;
