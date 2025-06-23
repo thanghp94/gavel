@@ -107,6 +107,9 @@ export const learningMaterials = pgTable("learning_materials", {
 // Schemas for validation
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
+export const insertMeetingSchema = createInsertSchema(meetings);
+export const insertReflectionSchema = createInsertSchema(reflections);
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = z.infer<typeof selectUserSchema>;
 export type Meeting = typeof meetings.$inferSelect;

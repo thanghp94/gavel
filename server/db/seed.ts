@@ -1,6 +1,7 @@
 
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import { eq } from 'drizzle-orm';
 import { users, roles, meetings, contentPages, learningMaterials, meetingRoles, roleContent } from '@shared/schema';
 import bcrypt from 'bcryptjs';
 
@@ -48,48 +49,80 @@ async function seed() {
         email: 'admin@gavelflow.com',
         passwordHash: await bcrypt.hash('admin123', 10),
         displayName: 'Sarah Chen',
+        fullName: 'Sarah Chen',
+        dateOfBirth: '1990-05-15',
+        school: 'National University of Singapore',
+        gender: 'Female',
         role: 'exco',
       },
       {
         email: 'john.doe@example.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'John Doe',
+        fullName: 'John Doe',
+        dateOfBirth: '1992-08-22',
+        school: 'Nanyang Technological University',
+        gender: 'Male',
         role: 'member',
       },
       {
         email: 'alice.nguyen@example.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'Alice Nguyen',
+        fullName: 'Alice Nguyen',
+        dateOfBirth: '1988-12-03',
+        school: 'Singapore Management University',
+        gender: 'Female',
         role: 'member',
       },
       {
         email: 'michael.smith@example.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'Michael Smith',
+        fullName: 'Michael Smith',
+        dateOfBirth: '1995-02-18',
+        school: 'SUTD',
+        gender: 'Male',
         role: 'member',
       },
       {
         email: 'emily.johnson@example.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'Emily Johnson',
+        fullName: 'Emily Johnson',
+        dateOfBirth: '1993-07-11',
+        school: 'SIT',
+        gender: 'Female',
         role: 'member',
       },
       {
         email: 'david.lee@example.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'David Lee',
+        fullName: 'David Lee',
+        dateOfBirth: '1991-11-25',
+        school: 'NTU',
+        gender: 'Male',
         role: 'member',
       },
       {
         email: 'lisa.tran@example.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'Lisa Tran',
+        fullName: 'Lisa Tran',
+        dateOfBirth: '1994-04-08',
+        school: 'SMU',
+        gender: 'Female',
         role: 'member',
       },
       {
         email: 'robert.wilson@example.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'Robert Wilson',
+        fullName: 'Robert Wilson',
+        dateOfBirth: '1987-12-20',
+        school: 'NUS',
+        gender: 'Male',
         role: 'member',
       }
     ];
