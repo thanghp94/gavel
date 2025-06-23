@@ -354,7 +354,7 @@ const ExcoUsers = () => {
                         <TableCell>
                           <Select 
                             value={user.role} 
-                            onValueChange={(newRole) => handleUpdateUserRole(user.id, newRole)}
+                            onValueChange={(newRole) => handleRoleChange(user.id, newRole)}
                           >
                             <SelectTrigger className="w-24">
                               <SelectValue />
