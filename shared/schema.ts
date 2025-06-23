@@ -9,7 +9,7 @@ export const users = pgTable("users", {
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   displayName: varchar("display_name", { length: 255 }).notNull(),
   fullName: varchar("full_name", { length: 255 }).notNull(),
-  dateOfBirth: date("date_of_birth"),
+  dateOfBirth: varchar("date_of_birth", { length: 20 }),
   school: varchar("school", { length: 255 }),
   gender: varchar("gender", { length: 20 }),
   role: varchar("role", { length: 50 }).notNull().default("member"),
@@ -105,26 +105,10 @@ export const learningMaterials = pgTable("learning_materials", {
 });
 
 // Schemas for validation
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-  lastLogin: true,
-});
-
+export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
-
-export const insertMeetingSchema = createInsertSchema(meetings).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertReflectionSchema = createInsertSchema(reflections).omit({
-  id: true,
-  submittedAt: true,
-});
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export type User = z.infer<typeof selectUserSchema>;
 export type Meeting = typeof meetings.$inferSelect;
 export type InsertMeeting = z.infer<typeof insertMeetingSchema>;
 export type Role = typeof roles.$inferSelect;

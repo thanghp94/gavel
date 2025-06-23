@@ -129,6 +129,13 @@ class ApiClient {
     });
   }
 
+  async updateUserStatus(userId: string, isActive: boolean) {
+    return this.request<any>(`/users/${userId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ isActive }),
+    });
+  }
+
   logout() {
     localStorage.removeItem('authToken');
   }
