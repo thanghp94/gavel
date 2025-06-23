@@ -1,4 +1,6 @@
+
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
@@ -19,34 +21,39 @@ import {
 
 export const ExcoNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const navigationItems = [
-    { icon: Home, label: "Dashboard", href: "/exco/dashboard", active: window.location.pathname === "/exco/dashboard" },
-    { icon: Users, label: "Members", href: "/exco/users", active: window.location.pathname === "/exco/users" },
-    { icon: Calendar, label: "Meetings", href: "/exco/meetings", active: window.location.pathname === "/exco/meetings" },
-    { icon: BookOpen, label: "Content", href: "/exco/content", active: window.location.pathname === "/exco/content" },
-    { icon: Globe, label: "Public Pages", href: "/exco/cms", active: window.location.pathname === "/exco/cms" },
-    { icon: FileText, label: "Tasks", href: "/exco/tasks", active: window.location.pathname === "/exco/tasks" },
-    { icon: TrendingUp, label: "Analytics", href: "/exco/analytics", active: window.location.pathname === "/exco/analytics" }
+    { icon: Home, label: "Dashboard", href: "/exco/dashboard" },
+    { icon: Users, label: "Members", href: "/exco/users" },
+    { icon: Calendar, label: "Meetings", href: "/exco/meetings" },
+    { icon: BookOpen, label: "Content", href: "/exco/content" },
+    { icon: Globe, label: "Public Pages", href: "/exco/cms" },
+    { icon: FileText, label: "Tasks", href: "/exco/tasks" },
+    { icon: TrendingUp, label: "Analytics", href: "/exco/analytics" }
   ];
 
   const NavItems = ({ mobile = false }) => (
     <div className={`${mobile ? 'space-y-2' : 'hidden md:flex md:space-x-6'}`}>
-      {navigationItems.map((item) => (
-        <a
-          key={item.label}
-          href={item.href}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            item.active
-              ? 'bg-orange-100 text-orange-700'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-          } ${mobile ? 'w-full' : ''}`}
-        >
-          <item.icon className="h-4 w-4" />
-          {item.label}
-          {item.active && <Badge variant="secondary" className="ml-auto">Active</Badge>}
-        </a>
-      ))}
+      {navigationItems.map((item) => {
+        const isActive = location.pathname === item.href;
+        return (
+          <Link
+            key={item.label}
+            to={item.href}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              isActive
+                ? 'bg-orange-100 text-orange-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            } ${mobile ? 'w-full' : ''}`}
+            onClick={() => mobile && setIsOpen(false)}
+          >
+            <item.icon className="h-4 w-4" />
+            {item.label}
+            {isActive && <Badge variant="secondary" className="ml-auto">Active</Badge>}
+          </Link>
+        );
+      })}
     </div>
   );
 
@@ -55,7 +62,7 @@ export const ExcoNavigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <Link to="/exco/dashboard" className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-orange-600 to-red-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">GF</span>
             </div>
@@ -66,7 +73,7 @@ export const ExcoNavigation = () => {
                 <p className="text-xs text-orange-600 font-medium">ExCo Portal</p>
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <NavItems />
