@@ -169,7 +169,7 @@ const MemberMeetings = () => {
                             <SelectContent>
                               <SelectItem value="no-role">No Role</SelectItem>
                               {roles.map((role) => (
-                                <SelectItem key={role.id} value={role.id}>
+                                <SelectItem key={role.id} value={role.id || "no-role"}>
                                   {role.name}
                                 </SelectItem>
                               ))}
