@@ -129,6 +129,11 @@ GavelFlow is a comprehensive web application designed for managing Toastmasters 
 - JWT secret configuration for token security
 - Separate development and production build processes
 
+## Recent Changes
+- June 24, 2025: Fixed syntax error in API client (removed extra comma on line 127)
+- June 24, 2025: Changed "View Attendees" button to "Add Attendee" functionality in AdminMeetings
+- June 24, 2025: Added addAttendee method to API client for future attendee management
+
 ## Changelog
 - June 24, 2025. Initial setup
 

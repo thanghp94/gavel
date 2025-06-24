@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Clock, MapPin, Users, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Plus, Edit, Trash2, Eye, UserPlus } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +20,13 @@ const AdminMeetings = () => {
   const { toast } = useToast();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAddAttendeeDialogOpen, setIsAddAttendeeDialogOpen] = useState(false);
+  const [selectedMeetingId, setSelectedMeetingId] = useState("");
+  const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedRoleId, setSelectedRoleId] = useState("");
+  
   const [newMeeting, setNewMeeting] = useState({
     title: "",
     date: "",
@@ -30,15 +37,21 @@ const AdminMeetings = () => {
   });
 
   useEffect(() => {
-    const fetchMeetings = async () => {
+    const fetchData = async () => {
       try {
-        const data = await api.getMeetings();
-        setMeetings(data);
+        const [meetingsData, usersData, rolesData] = await Promise.all([
+          api.getMeetings(),
+          api.getUsers(),
+          api.getRoles()
+        ]);
+        setMeetings(meetingsData);
+        setUsers(usersData);
+        setRoles(rolesData);
       } catch (error) {
-        console.error('Failed to fetch meetings:', error);
+        console.error('Failed to fetch data:', error);
         toast({
           title: "Error",
-          description: "Failed to load meetings",
+          description: "Failed to load data",
           variant: "destructive",
         });
       } finally {
@@ -46,7 +59,7 @@ const AdminMeetings = () => {
       }
     };
 
-    fetchMeetings();
+    fetchData();
   }, []);
 
   const handleAddMeeting = async () => {
@@ -93,18 +106,34 @@ const AdminMeetings = () => {
     });
   };
 
-  const handleViewAttendees = async (meetingId: string) => {
-    try {
-      const registrations = await api.getMeetingRegistrations(meetingId);
-      console.log("Meeting registrations:", registrations);
+  const handleAddAttendee = (meetingId: string) => {
+    setSelectedMeetingId(meetingId);
+    setSelectedUserId("");
+    setSelectedRoleId("");
+    setIsAddAttendeeDialogOpen(true);
+  };
+
+  const handleSubmitAttendee = async () => {
+    if (!selectedUserId) {
       toast({
-        title: "Info",
-        description: `Found ${registrations.length} registrations for this meeting`,
+        title: "Error",
+        description: "Please select a user to add",
+        variant: "destructive",
       });
+      return;
+    }
+
+    try {
+      await api.addAttendee(selectedMeetingId, selectedUserId, selectedRoleId || undefined);
+      toast({
+        title: "Success",
+        description: "Attendee added successfully",
+      });
+      setIsAddAttendeeDialogOpen(false);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to load attendees",
+        description: "Failed to add attendee",
         variant: "destructive",
       });
     }
@@ -340,7 +369,8 @@ const AdminMeetings = () => {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => handleViewAttendees(meeting.id)}
+                          onClick={() => handleAddAttendee(meeting.id)}
+                          title="Add Attendee"
                         >
                           <Users className="h-4 w-4" />
                         </Button>
@@ -352,6 +382,63 @@ const AdminMeetings = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Add Attendee Dialog */}
+        <Dialog open={isAddAttendeeDialogOpen} onOpenChange={setIsAddAttendeeDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add Attendee</DialogTitle>
+              <DialogDescription>
+                Select a user and role to add to the meeting
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="user-select">Select User</Label>
+                <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a user" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.displayName} ({user.email})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="role-select">Select Role (Optional)</Label>
+                <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No specific role</SelectItem>
+                    {roles.map((role) => (
+                      <SelectItem key={role.id} value={role.id}>
+                        {role.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsAddAttendeeDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmitAttendee}>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add Attendee
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

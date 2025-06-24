@@ -145,6 +145,15 @@ class ApiClient {
     return response;
   }
 
+  async addAttendee(meetingId: string, userId: string, roleId?: string) {
+    const response = await this.request(`/meetings/${meetingId}/add-attendee`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, roleId }),
+    });
+    return response;
+  }
+
   // User management methods
   async getUsers() {
     return this.request<any[]>('/users');

@@ -378,6 +378,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/meetings/:meetingId/add-attendee", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const { meetingId } = req.params;
+      const { userId, roleId } = req.body;
+
+      // Check if user already registered
+      const existing = await storage.getUserMeetingRegistration(userId, meetingId);
+      if (existing) {
+        return res.status(400).json({ message: "User already registered for this meeting" });
+      }
+
+      const registration = await storage.registerForMeeting(userId, meetingId, roleId);
+      res.json(registration);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to add attendee" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
