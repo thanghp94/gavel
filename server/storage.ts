@@ -219,7 +219,7 @@ export class DatabaseStorage implements IStorage {
       id: meetingRegistration.id,
       userId: meetingRegistration.userId,
       roleId: meetingRegistration.roleId,
-      dateRegistered: meetingRegistration.dateRegistered,
+      dateRegistered: meetingRegistration.dateRegister,
       attendanceStatus: meetingRegistration.attendanceStatus,
       speechTitle: meetingRegistration.speechTitle,
       speechObjectives: meetingRegistration.speechObjectives,

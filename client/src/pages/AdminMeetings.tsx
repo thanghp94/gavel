@@ -23,8 +23,8 @@ const AdminMeetings = () => {
   const [selectedMeetingId, setSelectedMeetingId] = useState("");
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("none");
+  const [selectedRoleId, setSelectedRoleId] = useState("no-role");
 
   const [newMeeting, setNewMeeting] = useState({
     title: "",
@@ -115,8 +115,8 @@ const AdminMeetings = () => {
 
   const handleAddAttendee = (meetingId: string) => {
     setSelectedMeetingId(meetingId);
-    setSelectedUserId("");
-    setSelectedRoleId("");
+    setSelectedUserId("none");
+    setSelectedRoleId("no-role");
     setIsAddAttendeeDialogOpen(true);
     setIsNewUser(false);
     setNewUserData({ email: "", displayName: "", fullName: "" });
@@ -141,7 +141,7 @@ const AdminMeetings = () => {
         });
 
         // Add the new user as an attendee
-        const finalRoleId = selectedRoleId === "" || selectedRoleId === "no-role" ? undefined : selectedRoleId;
+        const finalRoleId = selectedRoleId === "no-role" ? undefined : selectedRoleId;
         await api.addAttendee(selectedMeetingId, newUser.id, finalRoleId);
 
         toast({
@@ -157,7 +157,7 @@ const AdminMeetings = () => {
         });
       }
     } else {
-      if (!selectedUserId) {
+      if (!selectedUserId || selectedUserId === "none") {
         toast({
           title: "Error",
           description: "Please select a user to add",
@@ -167,7 +167,7 @@ const AdminMeetings = () => {
       }
 
       try {
-        const finalRoleId = selectedRoleId === "" || selectedRoleId === "no-role" ? undefined : selectedRoleId;
+        const finalRoleId = selectedRoleId === "no-role" ? undefined : selectedRoleId;
         await api.addAttendee(selectedMeetingId, selectedUserId, finalRoleId);
         toast({
           title: "Success",
@@ -177,7 +177,7 @@ const AdminMeetings = () => {
       } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to add attendee",
+          description: error.message || "Failed to add attendee",
           variant: "destructive",
         });
       }
@@ -491,6 +491,7 @@ const AdminMeetings = () => {
                       <SelectValue placeholder="Choose a user" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">Please select a user</SelectItem>
                       {users.map((user) => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.displayName} ({user.email})

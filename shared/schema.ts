@@ -65,7 +65,7 @@ export const meetingRegistration = pgTable("meeting_registration", {
   meetingId: uuid("meeting_id").notNull().references(() => meetings.id, { onDelete: "cascade" }),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   roleId: uuid("role_id").references(() => roles.id, { onDelete: "set null" }),
-  dateRegistered: timestamp("date_registered", { withTimezone: true }).defaultNow(),
+  dateRegister: timestamp("date_register", { withTimezone: true }).defaultNow(),
   attendanceStatus: varchar("attendance_status", { length: 20 }).default("registered"),
   speechTitle: varchar("speech_title", { length: 255 }),
   speechObjectives: text("speech_objectives"),

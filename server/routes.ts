@@ -392,7 +392,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const registration = await storage.registerForMeeting(userId, meetingId, roleId);
       res.json(registration);
     } catch (error) {
-      res.status(400).json({ message: "Failed to add attendee" });
+      console.error("Add attendee error:", error);
+      res.status(400).json({ message: error.message || "Failed to add attendee" });
     }
   });
 
