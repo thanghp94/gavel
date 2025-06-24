@@ -89,17 +89,17 @@ class ApiClient {
 
   // Content methods
   async getContentPage(slug: string) {
-    const response = await this.request(`/api/content/${slug}`);
+    const response = await this.request(`/content/${slug}`);
     return response;
   }
 
   async getContentPages() {
-    const response = await this.request('/api/content');
+    const response = await this.request('/content');
     return response;
   }
 
   async createContentPage(page: any) {
-    const response = await this.request('/api/content', {
+    const response = await this.request('/content', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(page),
@@ -108,7 +108,7 @@ class ApiClient {
   }
 
   async updateContentPage(id: string, updates: any) {
-    const response = await this.request(`/api/content/${id}`, {
+    const response = await this.request(`/content/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -118,26 +118,26 @@ class ApiClient {
 
   // Meeting registration methods
   async registerForMeeting(meetingId: string, roleId?: string, speechTitle?: string, speechObjectives?: string) {
-    const response = await this.request(`/api/meetings/${meetingId}/register`, {
+    const response = await this.request(`/meetings/${meetingId}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roleId, speechTitle, speechObjectives }),
     });
     return response;
-  },
+  }
 
   async getMeetingRegistrations(meetingId: string) {
-    const response = await this.request(`/api/meetings/${meetingId}/registrations`);
+    const response = await this.request(`/meetings/${meetingId}/registrations`);
     return response;
-  },
+  }
 
   async getMyMeetingRegistration(meetingId: string) {
-    const response = await this.request(`/api/meetings/${meetingId}/my-registration`);
+    const response = await this.request(`/meetings/${meetingId}/my-registration`);
     return response;
-  },
+  }
 
   async updateAttendanceStatus(registrationId: string, status: string) {
-    const response = await this.request(`/api/registrations/${registrationId}/attendance`, {
+    const response = await this.request(`/registrations/${registrationId}/attendance`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
