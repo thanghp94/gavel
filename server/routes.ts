@@ -329,6 +329,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Meeting registration routes
+  app.post("/api/meetings/:meetingId/register", authenticateToken, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const { meetingId } = req.params;
+      const { roleId } = req.body;
+
+      // Check if user already registered
+      const existing = await storage.getUserMeetingRegistration(user.id, meetingId);
+      if (existing) {
+        return res.status(400).json({ message: "Already registered for this meeting" });
+      }
+
+      const registration = await storage.registerForMeeting(user.id, meetingId, roleId);
+      res.json(registration);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to register for meeting" });
+    }
+  });
+
+  app.get("/api/meetings/:meetingId/registrations", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const registrations = await storage.getMeetingRegistrations(req.params.meetingId);
+      res.json(registrations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch registrations" });
+    }
+  });
+
+  app.get("/api/meetings/:meetingId/my-registration", authenticateToken, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const registration = await storage.getUserMeetingRegistration(user.id, req.params.meetingId);
+      res.json(registration || null);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch registration" });
+    }
+  });
+
+  app.put("/api/registrations/:registrationId/attendance", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const { status } = req.body;
+      const registration = await storage.updateAttendanceStatus(req.params.registrationId, status);
+      res.json(registration);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update attendance" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

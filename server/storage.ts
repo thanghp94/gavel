@@ -7,7 +7,7 @@ import {
   roles,
   roleContent,
   meetingRoles,
-  attendance,
+  meetingRegistration,
   reflections,
   contentPages,
   learningMaterials,
@@ -65,6 +65,12 @@ export interface IStorage {
   getContentPageBySlug(slug: string): Promise<ContentPage | undefined>;
   createContentPage(page: Partial<ContentPage>): Promise<ContentPage>;
   updateContentPage(id: string, updates: Partial<ContentPage>): Promise<ContentPage | undefined>;
+
+  // Meeting registration methods
+  registerForMeeting(userId: string, meetingId: string, roleId?: string): Promise<any>;
+  getMeetingRegistrations(meetingId: string): Promise<any[]>;
+  getUserMeetingRegistration(userId: string, meetingId: string): Promise<any | undefined>;
+  updateAttendanceStatus(registrationId: string, status: string): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -193,6 +199,50 @@ export class DatabaseStorage implements IStorage {
       createdAt: users.createdAt,
       lastLogin: users.lastLogin
     }).from(users).orderBy(users.createdAt);
+  }
+
+  // Meeting registration methods
+  async registerForMeeting(userId: string, meetingId: string, roleId?: string) {
+    const result = await db.insert(meetingRegistration).values({
+      userId,
+      meetingId,
+      roleId: roleId || null,
+      attendanceStatus: "registered"
+    }).returning();
+    return result[0];
+  }
+
+  async getMeetingRegistrations(meetingId: string) {
+    return await db.select({
+      id: meetingRegistration.id,
+      userId: meetingRegistration.userId,
+      roleId: meetingRegistration.roleId,
+      dateRegistered: meetingRegistration.dateRegistered,
+      attendanceStatus: meetingRegistration.attendanceStatus,
+      userDisplayName: users.displayName,
+      userFullName: users.fullName,
+      roleName: roles.name
+    })
+    .from(meetingRegistration)
+    .leftJoin(users, eq(meetingRegistration.userId, users.id))
+    .leftJoin(roles, eq(meetingRegistration.roleId, roles.id))
+    .where(eq(meetingRegistration.meetingId, meetingId));
+  }
+
+  async getUserMeetingRegistration(userId: string, meetingId: string) {
+    const result = await db.select()
+      .from(meetingRegistration)
+      .where(and(eq(meetingRegistration.userId, userId), eq(meetingRegistration.meetingId, meetingId)))
+      .limit(1);
+    return result[0];
+  }
+
+  async updateAttendanceStatus(registrationId: string, status: string) {
+    const result = await db.update(meetingRegistration)
+      .set({ attendanceStatus: status })
+      .where(eq(meetingRegistration.id, registrationId))
+      .returning();
+    return result[0];
   }
 }
 

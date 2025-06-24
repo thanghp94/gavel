@@ -75,6 +75,41 @@ const AdminMeetings = () => {
     }
   };
 
+  const handleViewMeeting = (meetingId: string) => {
+    // Navigate to meeting details page
+    console.log("View meeting:", meetingId);
+    toast({
+      title: "Info",
+      description: "Meeting details view not implemented yet",
+    });
+  };
+
+  const handleEditMeeting = (meetingId: string) => {
+    // Open edit dialog or navigate to edit page
+    console.log("Edit meeting:", meetingId);
+    toast({
+      title: "Info",
+      description: "Meeting edit functionality not implemented yet",
+    });
+  };
+
+  const handleViewAttendees = async (meetingId: string) => {
+    try {
+      const registrations = await api.getMeetingRegistrations(meetingId);
+      console.log("Meeting registrations:", registrations);
+      toast({
+        title: "Info",
+        description: `Found ${registrations.length} registrations for this meeting`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load attendees",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'upcoming': return 'bg-blue-100 text-blue-800';
@@ -288,14 +323,26 @@ const AdminMeetings = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleViewMeeting(meeting.id)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditMeeting(meeting.id)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="h-4 w-4" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleViewAttendees(meeting.id)}
+                        >
+                          <Users className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>

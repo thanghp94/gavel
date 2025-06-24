@@ -59,13 +59,14 @@ export const meetingRoles = pgTable("meeting_roles", {
   speechObjectives: text("speech_objectives"),
 });
 
-// Attendance table
-export const attendance = pgTable("attendance", {
+// Meeting registration table
+export const meetingRegistration = pgTable("meeting_registration", {
   id: uuid("id").primaryKey().defaultRandom(),
   meetingId: uuid("meeting_id").notNull().references(() => meetings.id, { onDelete: "cascade" }),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  attended: boolean("attended").notNull().default(false),
-  recordedAt: timestamp("recorded_at", { withTimezone: true }).defaultNow(),
+  roleId: uuid("role_id").references(() => roles.id, { onDelete: "set null" }),
+  dateRegistered: timestamp("date_registered", { withTimezone: true }).defaultNow(),
+  attendanceStatus: varchar("attendance_status", { length: 20 }).default("registered"),
 });
 
 // Reflections table

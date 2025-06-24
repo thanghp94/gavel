@@ -3,28 +3,79 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, Users, MessageSquare, Download } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Clock, MapPin, Users, MessageSquare, Download, UserPlus } from "lucide-react";
 import { MemberNavigation } from "@/components/navigation/MemberNavigation";
 import { api } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const MemberMeetings = () => {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [roles, setRoles] = useState([]);
+  const [registrations, setRegistrations] = useState({});
+  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchMeetings = async () => {
+    const fetchData = async () => {
       try {
-        const data = await api.getMeetings();
-        setMeetings(data);
+        const [meetingsData, rolesData] = await Promise.all([
+          api.getMeetings(),
+          api.getRoles()
+        ]);
+        setMeetings(meetingsData);
+        setRoles(rolesData);
+
+        // Fetch registration status for each meeting
+        const registrationPromises = meetingsData.map(async (meeting) => {
+          try {
+            const registration = await api.getMyMeetingRegistration(meeting.id);
+            return { meetingId: meeting.id, registration };
+          } catch (error) {
+            return { meetingId: meeting.id, registration: null };
+          }
+        });
+
+        const registrationResults = await Promise.all(registrationPromises);
+        const registrationMap = {};
+        registrationResults.forEach(({ meetingId, registration }) => {
+          registrationMap[meetingId] = registration;
+        });
+        setRegistrations(registrationMap);
       } catch (error) {
-        console.error('Failed to fetch meetings:', error);
+        console.error('Failed to fetch data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load meetings data",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMeetings();
+    fetchData();
   }, []);
+
+  const handleRegister = async (meetingId: string, roleId?: string) => {
+    try {
+      const registration = await api.registerForMeeting(meetingId, roleId);
+      setRegistrations(prev => ({
+        ...prev,
+        [meetingId]: registration
+      }));
+      toast({
+        title: "Success",
+        description: "Successfully registered for the meeting",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to register for meeting",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -100,6 +151,40 @@ const MemberMeetings = () => {
                 <div className="flex gap-2 flex-wrap">
                   {meeting.status === 'upcoming' && (
                     <>
+                      {registrations[meeting.id] ? (
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            Registered
+                          </Badge>
+                          <span className="text-sm text-gray-600">
+                            Status: {registrations[meeting.id].attendanceStatus}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Select onValueChange={(roleId) => handleRegister(meeting.id, roleId)}>
+                            <SelectTrigger className="w-48">
+                              <SelectValue placeholder="Register with role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">No specific role</SelectItem>
+                              {roles.map((role) => (
+                                <SelectItem key={role.id} value={role.id}>
+                                  {role.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleRegister(meeting.id)}
+                          >
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Register
+                          </Button>
+                        </div>
+                      )}
                       <Button variant="outline" size="sm">
                         <Download className="h-4 w-4 mr-2" />
                         Role Guidelines

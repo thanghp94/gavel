@@ -89,25 +89,60 @@ class ApiClient {
 
   // Content methods
   async getContentPage(slug: string) {
-    return this.request<any>(`/content/${slug}`);
+    const response = await this.request(`/api/content/${slug}`);
+    return response;
   }
 
   async getContentPages() {
-    return this.request<any[]>('/content');
+    const response = await this.request('/api/content');
+    return response;
   }
 
   async createContentPage(page: any) {
-    return this.request<any>('/content', {
+    const response = await this.request('/api/content', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(page),
     });
+    return response;
   }
 
-  async updateContentPage(id: string, page: any) {
-    return this.request<any>(`/content/${id}`, {
+  async updateContentPage(id: string, updates: any) {
+    const response = await this.request(`/api/content/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(page),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
     });
+    return response;
+  },
+
+  // Meeting registration methods
+  async registerForMeeting(meetingId: string, roleId?: string) {
+    const response = await this.request(`/api/meetings/${meetingId}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roleId }),
+    });
+    return response;
+  },
+
+  async getMeetingRegistrations(meetingId: string) {
+    const response = await this.request(`/api/meetings/${meetingId}/registrations`);
+    return response;
+  },
+
+  async getMyMeetingRegistration(meetingId: string) {
+    const response = await this.request(`/api/meetings/${meetingId}/my-registration`);
+    return response;
+  },
+
+  async updateAttendanceStatus(registrationId: string, status: string) {
+    const response = await this.request(`/api/registrations/${registrationId}/attendance`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    return response;
   }
 
   // User management methods
