@@ -139,7 +139,6 @@ class ApiClient {
   async updateAttendanceStatus(registrationId: string, status: string) {
     const response = await this.request(`/registrations/${registrationId}/attendance`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     });
     return response;
@@ -148,7 +147,6 @@ class ApiClient {
   async addAttendee(meetingId: string, userId: string, roleId?: string) {
     const response = await this.request(`/meetings/${meetingId}/add-attendee`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, roleId }),
     });
     return response;

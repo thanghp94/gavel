@@ -141,7 +141,8 @@ const AdminMeetings = () => {
         });
 
         // Add the new user as an attendee
-        await api.addAttendee(selectedMeetingId, newUser.id, selectedRoleId || undefined);
+        const finalRoleId = selectedRoleId === "" || selectedRoleId === "no-role" ? undefined : selectedRoleId;
+        await api.addAttendee(selectedMeetingId, newUser.id, finalRoleId);
 
         toast({
           title: "Success",
@@ -166,7 +167,7 @@ const AdminMeetings = () => {
       }
 
       try {
-        const finalRoleId = selectedRoleId === "" ? undefined : selectedRoleId;
+        const finalRoleId = selectedRoleId === "" || selectedRoleId === "no-role" ? undefined : selectedRoleId;
         await api.addAttendee(selectedMeetingId, selectedUserId, finalRoleId);
         toast({
           title: "Success",
