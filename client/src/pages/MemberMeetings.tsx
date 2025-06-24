@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,8 @@ const MemberMeetings = () => {
 
   const handleRegister = async (meetingId: string, roleId?: string) => {
     try {
-      const registration = await api.registerForMeeting(meetingId, roleId);
+      const finalRoleId = roleId === "no-role" ? undefined : roleId;
+      const registration = await api.registerForMeeting(meetingId, finalRoleId);
       setRegistrations(prev => ({
         ...prev,
         [meetingId]: registration
@@ -99,7 +99,7 @@ const MemberMeetings = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <MemberNavigation />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Meeting Schedule</h1>
@@ -147,7 +147,7 @@ const MemberMeetings = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-2 flex-wrap">
                   {meeting.status === 'upcoming' && (
                     <>
@@ -167,7 +167,7 @@ const MemberMeetings = () => {
                               <SelectValue placeholder="Register with role" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">No specific role</SelectItem>
+                              <SelectItem value="no-role">No Role</SelectItem>
                               {roles.map((role) => (
                                 <SelectItem key={role.id} value={role.id}>
                                   {role.name}

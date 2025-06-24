@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,7 @@ const AdminMeetings = () => {
   const [roles, setRoles] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [selectedRoleId, setSelectedRoleId] = useState("");
-  
+
   const [newMeeting, setNewMeeting] = useState({
     title: "",
     date: "",
@@ -148,17 +147,63 @@ const AdminMeetings = () => {
     }
   };
 
+  const handleRegister = async (meetingId: string, roleId: string, speechTitle?: string, speechObjectives?: string) => {
+    try {
+      const finalRoleId = roleId === "no-role" ? undefined : roleId;
+      await api.registerForMeeting(meetingId, finalRoleId, speechTitle, speechObjectives);
+      setShowRegisterDialog(false);
+      setSelectedRole("");
+      setSpeechTitle("");
+      setSpeechObjectives("");
+      // Refresh meeting registrations
+      loadMeetings();
+      toast({
+        title: "Success",
+        description: "Successfully registered for meeting",
+      });
+    } catch (error) {
+      toast({
+        title: "Error", 
+        description: "Failed to register for meeting",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const [showRegisterDialog, setShowRegisterDialog] = useState(false);
+  const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [selectedRole, setSelectedRole] = useState("");
+  const [speechTitle, setSpeechTitle] = useState("");
+  const [speechObjectives, setSpeechObjectives] = useState("");
+  const [meetingRegistrations, setMeetingRegistrations] = useState([]);
+
+  const loadMeetings = async () => {
+    try {
+      const meetingsData = await api.getMeetings();
+      setMeetings(meetingsData);
+      const registrationsData = await api.getMeetingRegistrations();
+      setMeetingRegistrations(registrationsData);
+    } catch (error) {
+      console.error('Failed to fetch meetings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load meetings",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <ExcoNavigation />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Meeting Management</h1>
             <p className="text-gray-600">Create and manage club meetings</p>
           </div>
-          
+
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -173,7 +218,7 @@ const AdminMeetings = () => {
                   Add a new meeting to the schedule
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -195,7 +240,7 @@ const AdminMeetings = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="date">Date</Label>
@@ -225,7 +270,7 @@ const AdminMeetings = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
@@ -237,7 +282,7 @@ const AdminMeetings = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="flex justify-end gap-3">
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                   Cancel
@@ -264,7 +309,7 @@ const AdminMeetings = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Upcoming</CardTitle>
@@ -279,7 +324,7 @@ const AdminMeetings = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Average Attendance</CardTitle>
@@ -392,7 +437,7 @@ const AdminMeetings = () => {
                 Select a user and role to add to the meeting
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="user-select">Select User</Label>
@@ -409,7 +454,7 @@ const AdminMeetings = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="role-select">Select Role (Optional)</Label>
                 <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
@@ -417,7 +462,7 @@ const AdminMeetings = () => {
                     <SelectValue placeholder="Choose a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No specific role</SelectItem>
+                    <SelectItem value="no-role">No Role</SelectItem>
                     {roles.map((role) => (
                       <SelectItem key={role.id} value={role.id}>
                         {role.name}
@@ -427,7 +472,7 @@ const AdminMeetings = () => {
                 </Select>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsAddAttendeeDialogOpen(false)}>
                 Cancel
