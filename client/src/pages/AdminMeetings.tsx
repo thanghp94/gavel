@@ -166,7 +166,8 @@ const AdminMeetings = () => {
       }
 
       try {
-        await api.addAttendee(selectedMeetingId, selectedUserId, selectedRoleId || undefined);
+        const finalRoleId = selectedRoleId === "" ? undefined : selectedRoleId;
+        await api.addAttendee(selectedMeetingId, selectedUserId, finalRoleId);
         toast({
           title: "Success",
           description: "Attendee added successfully",
@@ -534,7 +535,7 @@ const AdminMeetings = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id || "no-user"}>
+                        <SelectItem key={user.id} value={user.id}>
                           {user.displayName} ({user.email})
                         </SelectItem>
                       ))}
@@ -550,9 +551,9 @@ const AdminMeetings = () => {
                     <SelectValue placeholder="Choose a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="no-role">No Role</SelectItem>
+                    <SelectItem value="">No Role</SelectItem>
                     {roles.map((role) => (
-                      <SelectItem key={role.id} value={role.id || "no-role"}>
+                      <SelectItem key={role.id} value={role.id}>
                         {role.name}
                       </SelectItem>
                     ))}

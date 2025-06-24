@@ -58,7 +58,7 @@ const MemberMeetings = () => {
 
   const handleRegister = async (meetingId: string, roleId?: string) => {
     try {
-      const finalRoleId = roleId === "no-role" ? undefined : roleId;
+      const finalRoleId = roleId === "" ? undefined : roleId;
       const registration = await api.registerForMeeting(meetingId, finalRoleId);
       setRegistrations(prev => ({
         ...prev,
