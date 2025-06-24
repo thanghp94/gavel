@@ -58,7 +58,7 @@ const MemberMeetings = () => {
 
   const handleRegister = async (meetingId: string, roleId?: string) => {
     try {
-      const finalRoleId = roleId === "" ? undefined : roleId;
+      const finalRoleId = roleId === "" || roleId === "no-role" ? undefined : roleId;
       const registration = await api.registerForMeeting(meetingId, finalRoleId);
       setRegistrations(prev => ({
         ...prev,
@@ -167,9 +167,9 @@ const MemberMeetings = () => {
                               <SelectValue placeholder="Register with role" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="no-role">No Role</SelectItem>
+                              <SelectItem value="">No Role</SelectItem>
                               {roles.map((role) => (
-                                <SelectItem key={role.id} value={role.id || "no-role"}>
+                                <SelectItem key={role.id} value={role.id}>
                                   {role.name}
                                 </SelectItem>
                               ))}

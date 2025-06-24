@@ -192,51 +192,7 @@ const AdminMeetings = () => {
     }
   };
 
-  const handleRegister = async (meetingId: string, roleId: string, speechTitle?: string, speechObjectives?: string) => {
-    try {
-      const finalRoleId = roleId === "no-role" ? undefined : roleId;
-      await api.registerForMeeting(meetingId, finalRoleId, speechTitle, speechObjectives);
-      setShowRegisterDialog(false);
-      setSelectedRole("");
-      setSpeechTitle("");
-      setSpeechObjectives("");
-      // Refresh meeting registrations
-      loadMeetings();
-      toast({
-        title: "Success",
-        description: "Successfully registered for meeting",
-      });
-    } catch (error) {
-      toast({
-        title: "Error", 
-        description: "Failed to register for meeting",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const [showRegisterDialog, setShowRegisterDialog] = useState(false);
-  const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [selectedRole, setSelectedRole] = useState("");
-  const [speechTitle, setSpeechTitle] = useState("");
-  const [speechObjectives, setSpeechObjectives] = useState("");
-  const [meetingRegistrations, setMeetingRegistrations] = useState([]);
-
-  const loadMeetings = async () => {
-    try {
-      const meetingsData = await api.getMeetings();
-      setMeetings(meetingsData);
-      const registrationsData = await api.getMeetingRegistrations();
-      setMeetingRegistrations(registrationsData);
-    } catch (error) {
-      console.error('Failed to fetch meetings:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load meetings",
-        variant: "destructive",
-      });
-    }
-  };
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
