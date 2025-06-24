@@ -167,7 +167,7 @@ const MemberMeetings = () => {
                               <SelectValue placeholder="Register with role" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">No Role</SelectItem>
+                              <SelectItem value="no-role">No Role</SelectItem>
                               {roles.map((role) => (
                                 <SelectItem key={role.id} value={role.id}>
                                   {role.name}
