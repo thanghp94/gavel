@@ -202,12 +202,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Meeting registration methods
-  async registerForMeeting(userId: string, meetingId: string, roleId?: string) {
+  async registerForMeeting(userId: string, meetingId: string, roleId?: string, speechTitle?: string, speechObjectives?: string) {
     const result = await db.insert(meetingRegistration).values({
       userId,
       meetingId,
       roleId: roleId || null,
-      attendanceStatus: "registered"
+      attendanceStatus: "registered",
+      speechTitle: speechTitle || null,
+      speechObjectives: speechObjectives || null
     }).returning();
     return result[0];
   }
@@ -219,6 +221,8 @@ export class DatabaseStorage implements IStorage {
       roleId: meetingRegistration.roleId,
       dateRegistered: meetingRegistration.dateRegistered,
       attendanceStatus: meetingRegistration.attendanceStatus,
+      speechTitle: meetingRegistration.speechTitle,
+      speechObjectives: meetingRegistration.speechObjectives,
       userDisplayName: users.displayName,
       userFullName: users.fullName,
       roleName: roles.name

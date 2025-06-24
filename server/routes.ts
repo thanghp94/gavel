@@ -334,7 +334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = (req as any).user;
       const { meetingId } = req.params;
-      const { roleId } = req.body;
+      const { roleId, speechTitle, speechObjectives } = req.body;
 
       // Check if user already registered
       const existing = await storage.getUserMeetingRegistration(user.id, meetingId);
@@ -342,7 +342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Already registered for this meeting" });
       }
 
-      const registration = await storage.registerForMeeting(user.id, meetingId, roleId);
+      const registration = await storage.registerForMeeting(user.id, meetingId, roleId, speechTitle, speechObjectives);
       res.json(registration);
     } catch (error) {
       res.status(400).json({ message: "Failed to register for meeting" });

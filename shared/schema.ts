@@ -59,7 +59,7 @@ export const meetingRoles = pgTable("meeting_roles", {
   speechObjectives: text("speech_objectives"),
 });
 
-// Meeting registration table
+// Meeting registration table (includes meeting roles functionality)
 export const meetingRegistration = pgTable("meeting_registration", {
   id: uuid("id").primaryKey().defaultRandom(),
   meetingId: uuid("meeting_id").notNull().references(() => meetings.id, { onDelete: "cascade" }),
@@ -67,6 +67,8 @@ export const meetingRegistration = pgTable("meeting_registration", {
   roleId: uuid("role_id").references(() => roles.id, { onDelete: "set null" }),
   dateRegistered: timestamp("date_registered", { withTimezone: true }).defaultNow(),
   attendanceStatus: varchar("attendance_status", { length: 20 }).default("registered"),
+  speechTitle: varchar("speech_title", { length: 255 }),
+  speechObjectives: text("speech_objectives"),
 });
 
 // Reflections table

@@ -114,14 +114,14 @@ class ApiClient {
       body: JSON.stringify(updates),
     });
     return response;
-  },
+  }
 
   // Meeting registration methods
-  async registerForMeeting(meetingId: string, roleId?: string) {
+  async registerForMeeting(meetingId: string, roleId?: string, speechTitle?: string, speechObjectives?: string) {
     const response = await this.request(`/api/meetings/${meetingId}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ roleId }),
+      body: JSON.stringify({ roleId, speechTitle, speechObjectives }),
     });
     return response;
   },
