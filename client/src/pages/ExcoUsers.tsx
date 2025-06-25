@@ -42,7 +42,7 @@ const ExcoUsers = () => {
     phone: '',
     role: "member",
   });
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
@@ -385,13 +385,74 @@ const ExcoUsers = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingUser(user)}
-                          >
-                            View Details
-                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                View Details
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>User Details</DialogTitle>
+                              </DialogHeader>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Display Name</Label>
+                                  <p className="text-sm">{user.displayName}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Full Name</Label>
+                                  <p className="text-sm">{user.fullName || '-'}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Email</Label>
+                                  <p className="text-sm">{user.email}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Phone</Label>
+                                  <p className="text-sm">{user.phone || '-'}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">School</Label>
+                                  <p className="text-sm">{user.school || '-'}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Gender</Label>
+                                  <p className="text-sm">{user.gender || '-'}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Date of Birth</Label>
+                                  <p className="text-sm">{user.dateOfBirth || '-'}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Role</Label>
+                                  <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Status</Label>
+                                  <Badge variant={user.isActive ? 'default' : 'destructive'}>
+                                    {user.isActive ? 'Active' : 'Inactive'}
+                                  </Badge>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Created At</Label>
+                                  <p className="text-sm">{new Date(user.createdAt).toLocaleDateString()}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-gray-600">Last Login</Label>
+                                  <p className="text-sm">{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</p>
+                                </div>
+                              </div>
+                              <div className="flex justify-end space-x-2 mt-6">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => toggleUserStatus(user.id, !user.isActive)}
+                                >
+                                  {user.isActive ? 'Deactivate' : 'Activate'} User
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </TableCell>
                       </TableRow>
                     ))}
