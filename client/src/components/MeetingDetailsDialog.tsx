@@ -161,6 +161,49 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     }
   };
 
+  const handleCreateReport = (participant: any) => {
+    setSelectedParticipant(participant);
+    setReportData({
+      roleId: '',
+      evaluatorParticipationSession: '',
+      comment1: '',
+      timeUsed: '',
+      comment2: '',
+      qualified: false
+    });
+    setIsReportDialogOpen(true);
+  };
+
+  const handleSubmitReport = async () => {
+    if (!selectedParticipant || !reportData.roleId) {
+      toast({
+        title: "Error",
+        description: "Please select an evaluator role",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await api.createMeetingReport(meetingId, {
+        participationId: selectedParticipant.id,
+        ...reportData
+      });
+      
+      setIsReportDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Meeting report created successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create meeting report",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleAddParticipant = async () => {
     if (isNewUser) {
       if (!newUserData.email || !newUserData.displayName) {
