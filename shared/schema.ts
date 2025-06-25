@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, boolean, timestamp, time, date, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, boolean, timestamp, time, date, varchar, json } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -102,8 +102,11 @@ export const contentPages = pgTable("content_pages", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: varchar("slug", { length: 100 }).notNull().unique(),
   title: varchar("title", { length: 255 }).notNull(),
-  content: text("content").notNull(),
+  content: text("content").default(""), // Legacy field for simple content
+  blocks: json("blocks").default([]), // Rich content blocks for new editor
+  status: varchar("status", { length: 20 }).default("draft"), // draft, published
   isPublished: boolean("is_published").default(false),
+  lastModified: varchar("last_modified", { length: 20 }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

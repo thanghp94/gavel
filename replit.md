@@ -130,6 +130,10 @@ GavelFlow is a comprehensive web application designed for managing Toastmasters 
 - Separate development and production build processes
 
 ## Recent Changes
+- June 25, 2025: Fixed critical syntax errors in AdminContent.tsx and api.ts files
+- June 25, 2025: Updated database schema to support rich content blocks with JSONB storage
+- June 25, 2025: Enhanced content pages to store structured content blocks instead of plain text
+- June 25, 2025: Added support for title, text, image, video, and attachment content types
 - June 24, 2025: Fixed syntax error in API client (removed extra comma on line 127)
 - June 24, 2025: Changed "View Attendees" button to "Add Attendee" functionality in AdminMeetings
 - June 24, 2025: Added addAttendee method to API client for future attendee management

@@ -180,21 +180,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createContentPage(page: Partial<ContentPage>): Promise<ContentPage> {
-    const result = await db.insert(contentPages).values(page as any).returning();
+    const pageData = {
+      ...page,
+      blocks: page.blocks || [],
+      status: page.status || 'draft',
+      lastModified: new Date().toISOString().split('T')[0],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = await db.insert(contentPages).values(pageData as any).returning();
     return result[0];
   }
 
   async updateContentPage(id: string, updates: Partial<ContentPage>): Promise<ContentPage | undefined> {
-    const result = await db.update(contentPages).set({
+    const updateData = {
       ...updates,
+      lastModified: new Date().toISOString().split('T')[0],
       updatedAt: new Date()
-    }).where(eq(contentPages.id, id)).returning();
+    };
+    const result = await db.update(contentPages).set(updateData).where(eq(contentPages.id, id)).returning();
     return result[0];
   }
 
   async deleteContentPage(id: string): Promise<boolean> {
     const result = await db.delete(contentPages).where(eq(contentPages.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async getUsers() {
