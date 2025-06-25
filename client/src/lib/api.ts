@@ -95,11 +95,11 @@ class ApiClient {
 
   async getContentPages() {
     return this.request<any[]>('/content');
-  },
+  }
 
   async getContentPageBySlug(slug: string) {
     return this.request(`/content/${slug}`);
-  },
+  }
 
   async createContentPage(page: any) {
     return this.request<any>('/content', {
