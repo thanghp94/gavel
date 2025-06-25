@@ -189,10 +189,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
                 {participants.map((participant) => (
                   <TableRow key={participant.id}>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{participant.userDisplayName}</div>
-                        <div className="text-sm text-gray-600">{participant.userFullName}</div>
-                      </div>
+                      <div className="font-medium">{participant.userDisplayName}</div>
                     </TableCell>
                     <TableCell>
                       {editingParticipant?.id === participant.id ? (
