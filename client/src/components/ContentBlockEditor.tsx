@@ -277,11 +277,37 @@ const ContentBlockEditor = ({
       case 'video':
         return (
           <div className="mb-6">
-            <div className="bg-gray-100 p-4 rounded-lg border-2 border-dashed">
-              <Video className="h-8 w-8 mx-auto mb-2 text-gray-500" />
-              <p className="text-center text-gray-600">{block.content.videoTitle || 'Video Content'}</p>
-              <p className="text-center text-sm text-gray-500">{block.content.videoUrl}</p>
-            </div>
+            {block.content.videoUrl ? (
+              <div className="space-y-2">
+                {block.content.videoTitle && (
+                  <h4 className="font-medium">{block.content.videoTitle}</h4>
+                )}
+                {block.content.videoUrl.includes('youtube.com') || block.content.videoUrl.includes('youtu.be') ? (
+                  <div className="aspect-video">
+                    <iframe
+                      src={block.content.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                      className="w-full h-full rounded-lg"
+                      allowFullScreen
+                      title={block.content.videoTitle || 'Video'}
+                    />
+                  </div>
+                ) : (
+                  <video 
+                    controls 
+                    className="w-full rounded-lg"
+                    src={block.content.videoUrl}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+              </div>
+            ) : (
+              <div className="bg-gray-100 p-4 rounded-lg border-2 border-dashed">
+                <Video className="h-8 w-8 mx-auto mb-2 text-gray-500" />
+                <p className="text-center text-gray-600">{block.content.videoTitle || 'Video Content'}</p>
+                <p className="text-center text-sm text-gray-500">No video URL provided</p>
+              </div>
+            )}
           </div>
         );
       

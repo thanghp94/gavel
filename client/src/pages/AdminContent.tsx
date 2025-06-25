@@ -283,7 +283,11 @@ const AdminContent = () => {
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => window.open(`/${page.slug}`, '_blank')}
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="sm" onClick={() => handleDeletePage(page.id)}>
