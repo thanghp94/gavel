@@ -185,8 +185,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateContentPage(id: string, updates: Partial<ContentPage>): Promise<ContentPage | undefined> {
-    const result = await db.update(contentPages).set(updates).where(eq(contentPages.id, id)).returning();
+    const result = await db.update(contentPages).set({
+      ...updates,
+      updatedAt: new Date()
+    }).where(eq(contentPages.id, id)).returning();
     return result[0];
+  }
+
+  async deleteContentPage(id: string): Promise<boolean> {
+    const result = await db.delete(contentPages).where(eq(contentPages.id, id));
+    return result.rowCount > 0;
   }
 
   async getUsers() {

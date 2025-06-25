@@ -329,6 +329,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/content/:id", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const success = await storage.deleteContentPage(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      res.json({ message: "Page deleted successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete page" });
+    }
+  });
+
   // Meeting registration routes
   app.post("/api/meetings/:meetingId/register", authenticateToken, async (req, res) => {
     try {

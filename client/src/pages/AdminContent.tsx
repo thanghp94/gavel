@@ -1,5 +1,8 @@
+The code is being modified to integrate database functionality for content pages, including loading, saving, editing, and deleting pages.
+```
 
-import { useState } from "react";
+```replit_final_file
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Video, FileText, Users, Plus, Edit, Trash2, Eye, Upload, PenTool } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
 import ContentBlockEditor from "@/components/ContentBlockEditor";
+import { getContentPages, createContentPage, updateContentPage, deleteContentPage } from "@/lib/api";
 
 const AdminContent = () => {
   const [learningPaths, setLearningPaths] = useState([
@@ -59,7 +63,7 @@ const AdminContent = () => {
   const [isAddResourceDialogOpen, setIsAddResourceDialogOpen] = useState(false);
   const [isContentEditorOpen, setIsContentEditorOpen] = useState(false);
   const [editingPage, setEditingPage] = useState<any>(null);
-  
+
   const [newPath, setNewPath] = useState({
     title: "",
     description: "",
@@ -76,24 +80,7 @@ const AdminContent = () => {
     file: null as File | null
   });
 
-  const [contentPages, setContentPages] = useState([
-    {
-      id: 1,
-      title: "Club Meeting Guide",
-      slug: "meeting-guide",
-      status: "published",
-      lastModified: "2024-01-15",
-      blocks: []
-    },
-    {
-      id: 2,
-      title: "Speech Evaluation Tips",
-      slug: "evaluation-tips", 
-      status: "draft",
-      lastModified: "2024-01-12",
-      blocks: []
-    }
-  ]);
+  const [contentPages, setContentPages] = useState([]);
 
   const [newPageData, setNewPageData] = useState({
     title: "",
@@ -101,6 +88,19 @@ const AdminContent = () => {
     blocks: [],
     isPublished: false
   });
+
+  useEffect(() => {
+    loadContentPages();
+  }, []);
+
+  const loadContentPages = async () => {
+    try {
+      const pages = await getContentPages();
+      setContentPages(pages);
+    } catch (error) {
+      console.error("Error loading content pages:", error);
+    }
+  };
 
   const handleAddPath = () => {
     const path = {
@@ -156,34 +156,48 @@ const AdminContent = () => {
     setIsContentEditorOpen(true);
   };
 
-  const handleSavePage = (blocks: any[]) => {
+  const handleSavePage = async (blocks: any[]) => {
     const pageData = {
       ...newPageData,
       blocks,
-      lastModified: new Date().toISOString().split('T')[0]
+      lastModified: new Date().toISOString().split('T')[0],
+      status: newPageData.isPublished ? 'published' : 'draft'
     };
 
-    if (editingPage) {
-      // Update existing page
-      setContentPages(prev => 
-        prev.map(page => 
-          page.id === editingPage.id 
-            ? { ...page, ...pageData, status: pageData.isPublished ? 'published' : 'draft' }
-            : page
-        )
-      );
-    } else {
-      // Create new page
-      const newPage = {
-        id: contentPages.length + 1,
-        ...pageData,
-        status: pageData.isPublished ? 'published' : 'draft'
-      };
-      setContentPages(prev => [...prev, newPage]);
-    }
+    try {
+      if (editingPage) {
+        // Update existing page
+        await updateContentPage(editingPage.id, pageData);
+        setContentPages(prev =>
+          prev.map(page =>
+            page.id === editingPage.id
+              ? { ...page, ...pageData }
+              : page
+          )
+        );
+      } else {
+        // Create new page
+        const newPage = await createContentPage(pageData);
+        setContentPages(prev => [...prev, newPage]);
+      }
 
-    setIsContentEditorOpen(false);
-    setEditingPage(null);
+      setIsContentEditorOpen(false);
+      setEditingPage(null);
+      loadContentPages(); // Reload pages to reflect changes
+    } catch (error) {
+      console.error("Error saving content page:", error);
+      // Optionally, display an error message to the user
+    }
+  };
+
+  const handleDeletePage = async (pageId: string) => {
+    try {
+      await deleteContentPage(pageId);
+      setContentPages(prev => prev.filter(page => page.id !== pageId));
+    } catch (error) {
+      console.error("Error deleting content page:", error);
+      // Optionally, display an error message to the user
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -208,7 +222,7 @@ const AdminContent = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <ExcoNavigation />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Content Management</h1>
@@ -273,7 +287,7 @@ const AdminContent = () => {
                             <Button variant="ghost" size="sm">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleDeletePage(page.id)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -326,7 +340,7 @@ const AdminContent = () => {
                       Add a new learning path for members
                     </DialogDescription>
                   </DialogHeader>
-                  
+
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
                       <Label htmlFor="path-title">Title</Label>
@@ -337,7 +351,7 @@ const AdminContent = () => {
                         placeholder="Advanced Communication"
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="path-description">Description</Label>
                       <Textarea
@@ -347,7 +361,7 @@ const AdminContent = () => {
                         placeholder="Develop advanced speaking and communication skills..."
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="path-category">Category</Label>
@@ -363,7 +377,7 @@ const AdminContent = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="path-projects">Number of Projects</Label>
                         <Input
@@ -376,7 +390,7 @@ const AdminContent = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end gap-3">
                     <Button variant="outline" onClick={() => setIsAddPathDialogOpen(false)}>
                       Cancel
@@ -455,7 +469,7 @@ const AdminContent = () => {
                       Upload a new learning resource for members
                     </DialogDescription>
                   </DialogHeader>
-                  
+
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -467,7 +481,7 @@ const AdminContent = () => {
                           placeholder="Advanced Speaking Techniques"
                         />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="resource-type">Type</Label>
                         <Select onValueChange={(value) => setNewResource({...newResource, type: value})}>
@@ -483,7 +497,7 @@ const AdminContent = () => {
                         </Select>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="resource-category">Category</Label>
@@ -499,7 +513,7 @@ const AdminContent = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="resource-duration">Duration</Label>
                         <Input
@@ -510,7 +524,7 @@ const AdminContent = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="resource-description">Description</Label>
                       <Textarea
@@ -520,7 +534,7 @@ const AdminContent = () => {
                         placeholder="Detailed description of the resource..."
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="resource-file">Upload File</Label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -530,7 +544,7 @@ const AdminContent = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end gap-3">
                     <Button variant="outline" onClick={() => setIsAddResourceDialogOpen(false)}>
                       Cancel
@@ -601,7 +615,7 @@ const AdminContent = () => {
 
           <TabsContent value="analytics" className="space-y-6">
             <h2 className="text-2xl font-semibold">Content Analytics</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -615,7 +629,7 @@ const AdminContent = () => {
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Downloads</CardTitle>
@@ -630,7 +644,7 @@ const AdminContent = () => {
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Active Paths</CardTitle>

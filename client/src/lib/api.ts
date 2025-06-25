@@ -94,26 +94,27 @@ class ApiClient {
   }
 
   async getContentPages() {
-    const response = await this.request('/content');
-    return response;
+    return this.request<any[]>('/content');
   }
 
   async createContentPage(page: any) {
-    const response = await this.request('/content', {
+    return this.request<any>('/content', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(page),
     });
-    return response;
   }
 
   async updateContentPage(id: string, updates: any) {
-    const response = await this.request(`/content/${id}`, {
+    return this.request<any>(`/content/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
     });
-    return response;
+  }
+
+  async deleteContentPage(id: string): Promise<void> {
+    await this.request(`/content/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   // Meeting registration methods
@@ -193,3 +194,4 @@ class ApiClient {
 }
 
 export const api = new ApiClient();
+```
