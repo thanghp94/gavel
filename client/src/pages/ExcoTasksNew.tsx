@@ -117,8 +117,8 @@ const ExcoTasksNew = () => {
         title: newTask.title,
         description: newTask.description,
         priority: newTask.priority,
-        assigneeId: newTask.assigneeId || null,
-        teamId: newTask.teamId || null,
+        assigneeId: newTask.assigneeId && newTask.assigneeId !== 'unassigned' ? newTask.assigneeId : null,
+        teamId: newTask.teamId && newTask.teamId !== 'no-team' ? newTask.teamId : null,
         dueDate: newTask.dueDate || null,
         labels: newTask.labels,
         status: 'todo'
@@ -414,6 +414,7 @@ const ExcoTasksNew = () => {
                       <SelectValue placeholder="Select team (optional)" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="no-team">No Team</SelectItem>
                       {teams.map(team => (
                         <SelectItem key={team.id} value={team.id}>
                           <div className="flex items-center gap-2">
@@ -432,6 +433,7 @@ const ExcoTasksNew = () => {
                       <SelectValue placeholder="Select assignee (optional)" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
                       {users.map(user => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.displayName}

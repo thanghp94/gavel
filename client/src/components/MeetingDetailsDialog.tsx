@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -63,7 +62,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
 
   const fetchParticipants = async () => {
     if (!meetingId) return;
-    
+
     setLoading(true);
     try {
       const data = await api.getMeetingRegistrations(meetingId);
@@ -109,7 +108,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     try {
       const finalRoleId = selectedRoleId === "no-role" ? null : selectedRoleId;
       await api.updateParticipantRole(editingParticipant.id, finalRoleId);
-      
+
       // Update the participants list
       setParticipants(prev => prev.map(p => 
         p.id === editingParticipant.id 
@@ -137,10 +136,10 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
 
   const handleAttendanceCheck = async (participantId, currentStatus) => {
     const newStatus = currentStatus === 'present' ? 'absent' : 'present';
-    
+
     try {
       await api.updateAttendanceStatus(participantId, newStatus);
-      
+
       // Update the participants list
       setParticipants(prev => prev.map(p => 
         p.id === participantId 
@@ -189,7 +188,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
         participationId: selectedParticipant.id,
         ...reportData
       });
-      
+
       setIsReportDialogOpen(false);
       toast({
         title: "Success",
@@ -267,15 +266,15 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
       try {
         const finalRoleId = addParticipantRoleId === "no-role" ? undefined : addParticipantRoleId;
         await api.addAttendee(meetingId, selectedUserId, finalRoleId);
-        
+
         // Refresh participants list
         await fetchParticipants();
-        
+
         // Reset form and close dialog
         setSelectedUserId("");
         setAddParticipantRoleId("");
         setIsAddParticipantOpen(false);
-        
+
         toast({
           title: "Success",
           description: "Participant added successfully",
@@ -349,7 +348,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
               Add New Participant
             </Button>
           </div>
-          
+
           {loading ? (
             <div className="text-center py-4">Loading participants...</div>
           ) : (
@@ -451,7 +450,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
               </TableBody>
             </Table>
           )}
-          
+
           {participants.length === 0 && !loading && (
             <div className="text-center py-4 text-gray-500 text-sm">
               No participants registered for this meeting
