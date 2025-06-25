@@ -20,7 +20,7 @@ interface User {
   dateOfBirth: string;
   school: string;
   gender: string;
-  phoneNumber: string;
+  phone: string;
   role: string;
   isActive: boolean;
   createdAt: string;
@@ -39,7 +39,7 @@ const ExcoUsers = () => {
     dateOfBirth: "",
     school: "",
     gender: "",
-    phoneNumber: '',
+    phone: '',
     role: "member",
   });
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -117,7 +117,7 @@ const ExcoUsers = () => {
         description: `User created successfully. Temporary password: ${data.tempPassword}`,
       });
       setIsAddDialogOpen(false);
-      setNewUser({ email: "", displayName: "", fullName: "", dateOfBirth: "", school: "", gender: "", phoneNumber: '', role: "member" });
+      setNewUser({ email: "", displayName: "", fullName: "", dateOfBirth: "", school: "", gender: "", phone: '', role: "member" });
       fetchUsers(); // Refresh the users list
     } catch (error) {
       console.error('Failed to create user:', error);
@@ -284,9 +284,8 @@ const ExcoUsers = () => {
                          <div>
                           <Label htmlFor="phoneNumber">Phone Number</Label>
                           <Input
-                            id="phoneNumber"
-                            value={newUser.phoneNumber}
-                            onChange={(e) => setNewUser({ ...newUser, phoneNumber: e.target.value })}
+                            value={newUser.phone || ''}
+                            onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
                             placeholder="Phone Number"
                           />
                         </div>
@@ -364,7 +363,7 @@ const ExcoUsers = () => {
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.school || '-'}</TableCell>
                         <TableCell>{user.gender || '-'}</TableCell>
-                         <TableCell>{user.phoneNumber || '-'}</TableCell>
+                         <TableCell>{user.phone || '-'}</TableCell>
                         <TableCell>
                           <Select 
                             value={user.role} 
