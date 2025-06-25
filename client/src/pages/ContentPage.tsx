@@ -33,7 +33,7 @@ const ContentPage = () => {
       case 'title':
         return (
           <h1 key={index} className="text-3xl font-bold mb-6">
-            {block.content.text}
+            {block.content.title}
           </h1>
         );
       

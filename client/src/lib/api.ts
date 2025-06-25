@@ -98,7 +98,9 @@ class ApiClient {
   }
 
   async getContentPageBySlug(slug: string) {
-    return this.request(`/content/${slug}`);
+    return this.request(`/content/${slug}`, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   async createContentPage(page: any) {

@@ -290,9 +290,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/content/:slug", async (req, res) => {
     try {
       const page = await storage.getContentPageBySlug(req.params.slug);
-      if (!page || !page.isPublished) {
+      if (!page) {
         return res.status(404).json({ message: "Page not found" });
       }
+      
+      // Check if page is published or if user is authenticated as ExCo for preview
+      if (!page.isPublished) {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        
+        if (token) {
+          try {
+            const decoded = jwt.verify(token, JWT_SECRET) as any;
+            const user = await storage.getUser(decoded.userId);
+            if (!user || user.role !== 'exco') {
+              return res.status(404).json({ message: "Page not found" });
+            }
+          } catch {
+            return res.status(404).json({ message: "Page not found" });
+          }
+        } else {
+          return res.status(404).json({ message: "Page not found" });
+        }
+      }
+      
       res.json(page);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch page" });
