@@ -14,7 +14,10 @@ const ContentPage = () => {
     const loadPage = async () => {
       try {
         if (slug) {
+          console.log('Loading page with slug:', slug);
+          console.log('Auth token exists:', !!localStorage.getItem('authToken'));
           const pageData = await api.getContentPageBySlug(slug);
+          console.log('Page data loaded:', pageData);
           setPage(pageData);
         }
       } catch (error) {

@@ -3,6 +3,7 @@ const API_BASE = '/api';
 class ApiClient {
   private getAuthHeaders() {
     const token = localStorage.getItem('authToken');
+    console.log('Getting auth headers, token exists:', !!token);
     return {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
