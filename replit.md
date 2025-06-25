@@ -130,6 +130,9 @@ GavelFlow is a comprehensive web application designed for managing Toastmasters 
 - Separate development and production build processes
 
 ## Recent Changes
+- June 25, 2025: Fixed authentication issues for content management system
+- June 25, 2025: Created working ExCo admin account (demo@admin.com / admin123)
+- June 25, 2025: Verified content page saving with rich blocks working correctly
 - June 25, 2025: Fixed critical syntax errors in AdminContent.tsx and api.ts files
 - June 25, 2025: Updated database schema to support rich content blocks with JSONB storage
 - June 25, 2025: Enhanced content pages to store structured content blocks instead of plain text
