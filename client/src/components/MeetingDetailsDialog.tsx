@@ -200,7 +200,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="no-role">No Role</SelectItem>
-                              {roles.map((role) => (
+                              {roles.filter(role => role.id && role.id.trim() !== '').map((role) => (
                                 <SelectItem key={role.id} value={role.id}>
                                   {role.name}
                                 </SelectItem>

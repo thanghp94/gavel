@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,7 @@ const ExcoDashboard = () => {
 
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [selectedMeetingId, setSelectedMeetingId] = useState(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -52,9 +52,10 @@ const ExcoDashboard = () => {
     fetchMeetings();
   }, []);
 
-  const handleViewMeeting = async (meeting) => {
+  const handleViewMeeting = (meeting: any) => {
     console.log('View meeting:', meeting.id);
     setSelectedMeeting(meeting);
+    setSelectedMeetingId(meeting.id);
     setIsDetailsDialogOpen(true);
   };
 
@@ -138,7 +139,7 @@ const ExcoDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <ExcoNavigation />
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
@@ -164,7 +165,7 @@ const ExcoDashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Meetings</CardTitle>
@@ -177,7 +178,7 @@ const ExcoDashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
@@ -190,7 +191,7 @@ const ExcoDashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Reflections</CardTitle>
@@ -333,10 +334,12 @@ const ExcoDashboard = () => {
       {selectedMeeting && (
         <MeetingDetailsDialog
           meeting={selectedMeeting}
+          meetingId={selectedMeetingId}
           isOpen={isDetailsDialogOpen}
           onClose={() => {
             setIsDetailsDialogOpen(false);
             setSelectedMeeting(null);
+            setSelectedMeetingId(null);
           }}
         />
       )}
