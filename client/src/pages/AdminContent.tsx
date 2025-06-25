@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Video, FileText, Users, Plus, Edit, Trash2, Eye, Upload } from "lucide-react";
+import { BookOpen, Video, FileText, Users, Plus, Edit, Trash2, Eye, Upload, PenTool } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
+import ContentBlockEditor from "@/components/ContentBlockEditor";
 
 const AdminContent = () => {
   const [learningPaths, setLearningPaths] = useState([
@@ -56,6 +57,8 @@ const AdminContent = () => {
 
   const [isAddPathDialogOpen, setIsAddPathDialogOpen] = useState(false);
   const [isAddResourceDialogOpen, setIsAddResourceDialogOpen] = useState(false);
+  const [isContentEditorOpen, setIsContentEditorOpen] = useState(false);
+  const [editingPage, setEditingPage] = useState<any>(null);
   
   const [newPath, setNewPath] = useState({
     title: "",
@@ -71,6 +74,32 @@ const AdminContent = () => {
     duration: "",
     description: "",
     file: null as File | null
+  });
+
+  const [contentPages, setContentPages] = useState([
+    {
+      id: 1,
+      title: "Club Meeting Guide",
+      slug: "meeting-guide",
+      status: "published",
+      lastModified: "2024-01-15",
+      blocks: []
+    },
+    {
+      id: 2,
+      title: "Speech Evaluation Tips",
+      slug: "evaluation-tips", 
+      status: "draft",
+      lastModified: "2024-01-12",
+      blocks: []
+    }
+  ]);
+
+  const [newPageData, setNewPageData] = useState({
+    title: "",
+    slug: "",
+    blocks: [],
+    isPublished: false
   });
 
   const handleAddPath = () => {
@@ -105,6 +134,58 @@ const AdminContent = () => {
     setIsAddResourceDialogOpen(false);
   };
 
+  const handleCreateNewPage = () => {
+    setEditingPage(null);
+    setNewPageData({
+      title: "",
+      slug: "",
+      blocks: [],
+      isPublished: false
+    });
+    setIsContentEditorOpen(true);
+  };
+
+  const handleEditPage = (page: any) => {
+    setEditingPage(page);
+    setNewPageData({
+      title: page.title,
+      slug: page.slug,
+      blocks: page.blocks || [],
+      isPublished: page.status === 'published'
+    });
+    setIsContentEditorOpen(true);
+  };
+
+  const handleSavePage = (blocks: any[]) => {
+    const pageData = {
+      ...newPageData,
+      blocks,
+      lastModified: new Date().toISOString().split('T')[0]
+    };
+
+    if (editingPage) {
+      // Update existing page
+      setContentPages(prev => 
+        prev.map(page => 
+          page.id === editingPage.id 
+            ? { ...page, ...pageData, status: pageData.isPublished ? 'published' : 'draft' }
+            : page
+        )
+      );
+    } else {
+      // Create new page
+      const newPage = {
+        id: contentPages.length + 1,
+        ...pageData,
+        status: pageData.isPublished ? 'published' : 'draft'
+      };
+      setContentPages(prev => [...prev, newPage]);
+    }
+
+    setIsContentEditorOpen(false);
+    setEditingPage(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
@@ -134,12 +215,99 @@ const AdminContent = () => {
           <p className="text-gray-600">Manage learning paths, resources, and educational content</p>
         </div>
 
-        <Tabs defaultValue="paths" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="pages" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="pages">Content Pages</TabsTrigger>
             <TabsTrigger value="paths">Learning Paths</TabsTrigger>
             <TabsTrigger value="resources">Resources</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="pages" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Content Pages</h2>
+              <Button onClick={handleCreateNewPage} className="flex items-center gap-2">
+                <PenTool className="h-4 w-4" />
+                Create New Page
+              </Button>
+            </div>
+
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Page Title</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Last Modified</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {contentPages.map((page) => (
+                      <TableRow key={page.id}>
+                        <TableCell>
+                          <div className="font-medium">{page.title}</div>
+                        </TableCell>
+                        <TableCell>
+                          <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                            /{page.slug}
+                          </code>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(page.status)}>
+                            {page.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{page.lastModified}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleEditPage(page)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            {/* Content Editor Dialog */}
+            <Dialog open={isContentEditorOpen} onOpenChange={setIsContentEditorOpen}>
+              <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingPage ? `Edit: ${editingPage.title}` : 'Create New Page'}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Use the content editor to create rich, interactive pages with multiple content blocks.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <ContentBlockEditor
+                  initialBlocks={newPageData.blocks}
+                  onSave={handleSavePage}
+                  pageTitle={newPageData.title}
+                  onPageTitleChange={(title) => setNewPageData(prev => ({ ...prev, title, slug: title.toLowerCase().replace(/\s+/g, '-') }))}
+                  isPublished={newPageData.isPublished}
+                  onPublishChange={(published) => setNewPageData(prev => ({ ...prev, isPublished: published }))}
+                />
+              </DialogContent>
+            </Dialog>
+          </TabsContent>
 
           <TabsContent value="paths" className="space-y-6">
             <div className="flex justify-between items-center">
