@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Clock, MapPin, Users, Edit, CheckSquare, User } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar, Clock, MapPin, Users, Edit, CheckSquare, User, UserPlus } from "lucide-react";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,15 +21,20 @@ interface MeetingDetailsDialogProps {
 export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: MeetingDetailsDialogProps) => {
   const [participants, setParticipants] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingParticipant, setEditingParticipant] = useState(null);
   const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [addParticipantRoleId, setAddParticipantRoleId] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen && meetingId) {
       fetchParticipants();
       fetchRoles();
+      fetchUsers();
     }
   }, [isOpen, meetingId]);
 
@@ -56,6 +63,15 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
       setRoles(data);
     } catch (error) {
       console.error('Failed to fetch roles:', error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const data = await api.getUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
     }
   };
 
@@ -122,6 +138,41 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     }
   };
 
+  const handleAddParticipant = async () => {
+    if (!selectedUserId || selectedUserId === "none") {
+      toast({
+        title: "Error",
+        description: "Please select a user to add",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const finalRoleId = addParticipantRoleId === "no-role" ? undefined : addParticipantRoleId;
+      await api.addAttendee(meetingId, selectedUserId, finalRoleId);
+      
+      // Refresh participants list
+      await fetchParticipants();
+      
+      // Reset form and close dialog
+      setSelectedUserId("");
+      setAddParticipantRoleId("");
+      setIsAddParticipantOpen(false);
+      
+      toast({
+        title: "Success",
+        description: "Participant added successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add participant",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getAttendanceColor = (status) => {
     switch (status) {
       case 'present': return 'bg-green-100 text-green-800';
@@ -178,17 +229,10 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
             </h3>
             <Button 
               size="sm" 
-              onClick={() => {
-                // You can add your add participant logic here
-                // For now, this will just show a placeholder action
-                toast({
-                  title: "Add Participant",
-                  description: "Add participant functionality would go here",
-                });
-              }}
+              onClick={() => setIsAddParticipantOpen(true)}
               className="h-8 px-3 text-xs"
             >
-              <Users className="h-3 w-3 mr-1" />
+              <UserPlus className="h-3 w-3 mr-1" />
               Add New Participant
             </Button>
           </div>
@@ -299,6 +343,66 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
           </Button>
         </div>
       </DialogContent>
+
+      {/* Add Participant Dialog */}
+      <Dialog open={isAddParticipantOpen} onOpenChange={setIsAddParticipantOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Participant</DialogTitle>
+            <DialogDescription>
+              Add an existing user to this meeting
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="user-select">Select User</Label>
+              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a user" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Select a user...</SelectItem>
+                  {users
+                    .filter(user => !participants.some(p => p.userId === user.id))
+                    .map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.displayName} ({user.email})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role-select">Select Role (Optional)</Label>
+              <Select value={addParticipantRoleId} onValueChange={setAddParticipantRoleId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="no-role">No Role</SelectItem>
+                  {roles.filter(role => role.id && role.id.trim() !== '').map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => setIsAddParticipantOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddParticipant}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Add Participant
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };
