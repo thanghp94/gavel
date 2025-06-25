@@ -249,36 +249,32 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{meeting.title}</DialogTitle>
-          <DialogDescription className="text-base">{meeting.theme}</DialogDescription>
+          <DialogDescription className="space-y-2">
+            <div className="text-base text-gray-700">{meeting.theme}</div>
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                <span>{new Date(meeting.date).toLocaleDateString('en-GB', { 
+                  day: '2-digit', 
+                  month: '2-digit', 
+                  year: '2-digit' 
+                })}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span>{meeting.time}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                <span>{meeting.location}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-3 w-3" />
+                <span>{participants.length} participants</span>
+              </div>
+            </div>
+          </DialogDescription>
         </DialogHeader>
-
-        {/* Meeting Details */}
-        <div className="grid md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-gray-600">
-              <Calendar className="h-4 w-4" />
-              <span>{new Date(meeting.date).toLocaleDateString('en-GB', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: '2-digit' 
-              })}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Clock className="h-4 w-4" />
-              <span>{meeting.time}</span>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="h-4 w-4" />
-              <span>{meeting.location}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Users className="h-4 w-4" />
-              <span>{participants.length} participants</span>
-            </div>
-          </div>
-        </div>
 
         {/* Participants Table */}
         <div className="space-y-2">
