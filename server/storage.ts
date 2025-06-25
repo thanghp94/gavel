@@ -429,7 +429,7 @@ export class DatabaseStorage implements IStorage {
 
   // Task methods
   async getTasks(teamId?: string): Promise<Task[]> {
-    let baseQuery = db
+    const baseQuery = db
       .select({
         id: tasks.id,
         title: tasks.title,
@@ -464,16 +464,16 @@ export class DatabaseStorage implements IStorage {
     return result.map(row => ({
       id: row.id,
       title: row.title,
-      description: row.description || '',
+      description: row.description,
       status: row.status,
       priority: row.priority,
+      createdBy: row.createdBy,
       assigneeId: row.assigneeId,
       teamId: row.teamId,
-      dueDate: row.dueDate || '',
-      labels: Array.isArray(row.labels) ? row.labels : [],
-      createdAt: row.createdAt || null,
-      updatedAt: row.updatedAt || null,
-      createdBy: row.createdBy,
+      dueDate: row.dueDate,
+      labels: row.labels,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
       assignee: row.assignee?.id ? row.assignee : undefined,
       team: row.team?.id ? row.team : undefined
     }));
