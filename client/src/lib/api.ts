@@ -95,7 +95,11 @@ class ApiClient {
 
   async getContentPages() {
     return this.request<any[]>('/content');
-  }
+  },
+
+  async getContentPageBySlug(slug: string) {
+    return this.request(`/content/${slug}`);
+  },
 
   async createContentPage(page: any) {
     return this.request<any>('/content', {
@@ -104,10 +108,10 @@ class ApiClient {
     });
   }
 
-  async updateContentPage(id: string, updates: any) {
+  async updateContentPage(id: string, page: any) {
     return this.request<any>(`/content/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(updates),
+      body: JSON.stringify(page),
     });
   }
 
