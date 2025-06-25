@@ -248,6 +248,14 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return result[0];
   }
+
+  async updateRegistrationRole(registrationId: string, roleId: string | null) {
+    const result = await db.update(meetingRegistration)
+      .set({ roleId })
+      .where(eq(meetingRegistration.id, registrationId))
+      .returning();
+    return result[0];
+  }
 }
 
 export const storage = new DatabaseStorage();

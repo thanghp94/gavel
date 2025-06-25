@@ -397,6 +397,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add attendee to meeting
+  app.post('/api/meetings/:meetingId/add-attendee', authenticateToken, requireExco, async (req, res) => {
+    try {
+      const { meetingId } = req.params;
+      const { userId, roleId } = req.body;
+
+      const registration = await storage.registerForMeeting(userId, meetingId, roleId);
+      res.json(registration);
+    } catch (error) {
+      console.error('Error adding attendee:', error);
+      res.status(400).json({ error: 'Failed to add attendee' });
+    }
+  });
+
+  // Get meeting registrations
+  app.get('/api/meetings/:meetingId/registrations', authenticateToken, requireExco, async (req, res) => {
+    try {
+      const { meetingId } = req.params;
+      const registrations = await storage.getMeetingRegistrations(meetingId);
+      res.json(registrations);
+    } catch (error) {
+      console.error('Error fetching registrations:', error);
+      res.status(500).json({ error: 'Failed to fetch registrations' });
+    }
+  });
+
+  // Update participant role
+  app.put('/api/registrations/:registrationId/role', authenticateToken, requireExco, async (req, res) => {
+    try {
+      const { registrationId } = req.params;
+      const { roleId } = req.body;
+
+      const result = await storage.updateRegistrationRole(registrationId, roleId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error updating role:', error);
+      res.status(400).json({ error: 'Failed to update role' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

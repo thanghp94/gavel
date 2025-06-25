@@ -153,6 +153,18 @@ class ApiClient {
     return response;
   }
 
+  async getMeetingRegistrations(meetingId: string) {
+    return await this.request(`/meetings/${meetingId}/registrations`);
+  }
+
+  async updateParticipantRole(registrationId: string, roleId: string | null) {
+    const response = await this.request(`/registrations/${registrationId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify({ roleId }),
+    });
+    return response;
+  }
+
   // User management methods
   async getUsers() {
     return this.request<any[]>('/users');

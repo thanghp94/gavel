@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, Clock, MapPin, Users, Plus, Edit, Trash2, Eye, UserPlus } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
+import { MeetingDetailsDialog } from "@/components/MeetingDetailsDialog";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,7 +21,9 @@ const AdminMeetings = () => {
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isAddAttendeeDialogOpen, setIsAddAttendeeDialogOpen] = useState(false);
+  const [isMeetingDetailsOpen, setIsMeetingDetailsOpen] = useState(false);
   const [selectedMeetingId, setSelectedMeetingId] = useState("");
+  const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("none");
@@ -96,12 +99,10 @@ const AdminMeetings = () => {
   };
 
   const handleViewMeeting = (meetingId: string) => {
-    // Navigate to meeting details page
-    console.log("View meeting:", meetingId);
-    toast({
-      title: "Info",
-      description: "Meeting details view not implemented yet",
-    });
+    const meeting = meetings.find(m => m.id === meetingId);
+    setSelectedMeeting(meeting);
+    setSelectedMeetingId(meetingId);
+    setIsMeetingDetailsOpen(true);
   };
 
   const handleEditMeeting = (meetingId: string) => {
@@ -531,6 +532,14 @@ const AdminMeetings = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Meeting Details Dialog */}
+        <MeetingDetailsDialog
+          isOpen={isMeetingDetailsOpen}
+          onClose={() => setIsMeetingDetailsOpen(false)}
+          meetingId={selectedMeetingId}
+          meeting={selectedMeeting}
+        />
       </main>
     </div>
   );
