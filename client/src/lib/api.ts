@@ -81,19 +81,19 @@ class ApiClient {
 
   // Task methods
   async getTasks(teamId?: string) {
-    const url = teamId ? `/api/tasks?teamId=${teamId}` : '/api/tasks';
+    const url = teamId ? `/tasks?teamId=${teamId}` : '/tasks';
     return this.request(url);
   }
 
   async createTask(taskData: any) {
-    return this.request('/api/tasks', {
+    return this.request('/tasks', {
       method: 'POST',
       body: JSON.stringify(taskData),
     });
   }
 
   async updateTask(taskId: string, updates: any) {
-    return this.request(`/api/tasks/${taskId}`, {
+    return this.request(`/tasks/${taskId}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
@@ -101,18 +101,18 @@ class ApiClient {
 
   // Team methods
   async getTeams() {
-    return this.request('/api/teams');
+    return this.request('/teams');
   }
 
   async createTeam(teamData: any) {
-    return this.request('/api/teams', {
+    return this.request('/teams', {
       method: 'POST',
       body: JSON.stringify(teamData),
     });
   }
 
   async getTeamMembers(teamId: string) {
-    return this.request(`/api/teams/${teamId}/members`);
+    return this.request(`/teams/${teamId}/members`);
   }
 
   // Reflection methods

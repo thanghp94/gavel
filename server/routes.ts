@@ -581,6 +581,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Team routes
+  app.get("/api/teams", authenticateToken, async (req, res) => {
+    try {
+      const teams = await storage.getTeams();
+      res.json(teams);
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+      res.status(500).json({ message: "Failed to fetch teams" });
+    }
+  });
+
+  app.post("/api/teams", authenticateToken, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const teamData = insertTeamSchema.parse({
+        ...req.body,
+        leaderId: user.id,
+      });
+      const team = await storage.createTeam(teamData);
+      res.json(team);
+    } catch (error) {
+      console.error('Error creating team:', error);
+      res.status(400).json({ message: "Failed to create team" });
+    }
+  });
+
+  app.get("/api/teams/:teamId/members", authenticateToken, async (req, res) => {
+    try {
+      const members = await storage.getTeamMembers(req.params.teamId);
+      res.json(members);
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+      res.status(500).json({ message: "Failed to fetch team members" });
+    }
+  });
+
+  // Task routes
+  app.get("/api/tasks", authenticateToken, async (req, res) => {
+    try {
+      const teamId = req.query.teamId as string;
+      const tasks = await storage.getTasks(teamId);
+      res.json(tasks);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      res.status(500).json({ message: "Failed to fetch tasks" });
+    }
+  });
+
   app.post("/api/tasks", authenticateToken, async (req, res) => {
     try {
       const user = (req as any).user;
