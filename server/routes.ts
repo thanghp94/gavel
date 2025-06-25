@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertMeetingSchema, insertReflectionSchema } from "@shared/schema";
+import { insertUserSchema, insertMeetingSchema, insertReflectionSchema, insertMeetingReportSchema } from "@shared/schema";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key";
 
@@ -487,6 +487,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error updating role:', error);
       res.status(400).json({ error: 'Failed to update role' });
+    }
+  });
+
+  // Meeting report routes
+  app.post("/api/meetings/:meetingId/reports", authenticateToken, async (req, res) => {
+    try {
+      const { meetingId } = req.params;
+      const reportData = req.body;
+      const user = (req as any).user;
+
+      // Validate the report data
+      const validatedData = insertMeetingReportSchema.parse({
+        ...reportData,
+        createdBy: user.id,
+      });
+
+      const report = await storage.createMeetingReport(validatedData);
+      res.json(report);
+    } catch (error) {
+      console.error('Error creating meeting report:', error);
+      res.status(400).json({ message: "Failed to create meeting report" });
+    }
+  });
+
+  app.get("/api/meetings/:meetingId/reports", authenticateToken, async (req, res) => {
+    try {
+      const { meetingId } = req.params;
+      const reports = await storage.getMeetingReports(meetingId);
+      res.json(reports);
+    } catch (error) {
+      console.error('Error fetching meeting reports:', error);
+      res.status(500).json({ message: "Failed to fetch meeting reports" });
+    }
+  });
+
+  app.get("/api/participants/:participationId/reports", authenticateToken, async (req, res) => {
+    try {
+      const { participationId } = req.params;
+      const reports = await storage.getParticipantReports(participationId);
+      res.json(reports);
+    } catch (error) {
+      console.error('Error fetching participant reports:', error);
+      res.status(500).json({ message: "Failed to fetch participant reports" });
     }
   });
 

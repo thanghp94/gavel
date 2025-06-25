@@ -200,6 +200,22 @@ class ApiClient {
     });
   }
 
+  // Meeting report methods
+  async createMeetingReport(meetingId: string, report: any) {
+    return this.request(`/api/meetings/${meetingId}/reports`, {
+      method: "POST",
+      body: JSON.stringify(report),
+    });
+  }
+
+  async getMeetingReports(meetingId: string) {
+    return this.request(`/api/meetings/${meetingId}/reports`);
+  }
+
+  async getParticipantReports(participationId: string) {
+    return this.request(`/api/participants/${participationId}/reports`);
+  }
+
   logout() {
     localStorage.removeItem('authToken');
   }

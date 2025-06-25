@@ -12,6 +12,7 @@ import {
   reflections,
   contentPages,
   learningMaterials,
+  meetingReports,
   type User,
   type InsertUser,
   type Meeting,
@@ -19,7 +20,9 @@ import {
   type Role,
   type Reflection,
   type InsertReflection,
-  type ContentPage
+  type ContentPage,
+  type MeetingReport,
+  type InsertMeetingReport
 } from "@shared/schema";
 import * as schema from "@shared/schema";
 
@@ -79,6 +82,11 @@ export interface IStorage {
   getMeetingRegistrations(meetingId: string): Promise<any[]>;
   getUserMeetingRegistration(userId: string, meetingId: string): Promise<any | undefined>;
   updateAttendanceStatus(registrationId: string, status: string): Promise<any>;
+
+  // Meeting report methods
+  createMeetingReport(report: InsertMeetingReport): Promise<MeetingReport>;
+  getMeetingReports(meetingId: string): Promise<any[]>;
+  getParticipantReports(participationId: string): Promise<MeetingReport[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -281,6 +289,52 @@ export class DatabaseStorage implements IStorage {
       .where(eq(meetingRegistration.id, registrationId))
       .returning();
     return result[0];
+  }
+
+  // Meeting report methods
+  async createMeetingReport(report: InsertMeetingReport): Promise<MeetingReport> {
+    const [created] = await db
+      .insert(meetingReports)
+      .values(report)
+      .returning();
+    return created;
+  }
+
+  async getMeetingReports(meetingId: string): Promise<any[]> {
+    const result = await db
+      .select({
+        report: meetingReports,
+        participant: {
+          id: meetingRegistration.id,
+          userDisplayName: users.displayName,
+          userId: users.id,
+        },
+        evaluatorRole: {
+          id: roles.id,
+          name: roles.name,
+        },
+        createdByUser: {
+          id: users.id,
+          displayName: users.displayName,
+        }
+      })
+      .from(meetingReports)
+      .innerJoin(meetingRegistration, eq(meetingReports.participationId, meetingRegistration.id))
+      .innerJoin(users, eq(meetingRegistration.userId, users.id))
+      .innerJoin(roles, eq(meetingReports.roleId, roles.id))
+      .leftJoin(users as any, eq(meetingReports.createdBy, users.id))
+      .where(eq(meetingRegistration.meetingId, meetingId));
+    
+    return result;
+  }
+
+  async getParticipantReports(participationId: string): Promise<MeetingReport[]> {
+    const result = await db
+      .select()
+      .from(meetingReports)
+      .where(eq(meetingReports.participationId, participationId));
+    
+    return result;
   }
 }
 

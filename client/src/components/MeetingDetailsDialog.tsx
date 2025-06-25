@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar, Clock, MapPin, Users, Edit, CheckSquare, User, UserPlus } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Edit, CheckSquare, User, UserPlus, FileText } from "lucide-react";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 interface MeetingDetailsDialogProps {
   isOpen: boolean;
@@ -37,6 +38,19 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     gender: "",
     phone: ""
   });
+
+  // Report dialog state
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
+  const [reportData, setReportData] = useState({
+    roleId: '',
+    evaluatorParticipationSession: '',
+    comment1: '',
+    timeUsed: '',
+    comment2: '',
+    qualified: false
+  });
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -249,30 +263,30 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{meeting.title}</DialogTitle>
-          <DialogDescription className="space-y-2">
-            <div className="text-base text-gray-700">{meeting.theme}</div>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
+          <DialogDescription>
+            <span className="block text-base text-gray-700 mb-2">{meeting.theme}</span>
+            <span className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 <span>{new Date(meeting.date).toLocaleDateString('en-GB', { 
                   day: '2-digit', 
                   month: '2-digit', 
                   year: '2-digit' 
                 })}</span>
-              </div>
-              <div className="flex items-center gap-1">
+              </span>
+              <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 <span>{meeting.time}</span>
-              </div>
-              <div className="flex items-center gap-1">
+              </span>
+              <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 <span>{meeting.location}</span>
-              </div>
-              <div className="flex items-center gap-1">
+              </span>
+              <span className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
                 <span>{participants.length} participants</span>
-              </div>
-            </div>
+              </span>
+            </span>
           </DialogDescription>
         </DialogHeader>
 
@@ -377,6 +391,15 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
                           className="h-6 w-6 p-0"
                         >
                           <CheckSquare className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCreateReport(participant)}
+                          title="Create Report"
+                          className="h-6 w-6 p-0"
+                        >
+                          <FileText className="h-3 w-3" />
                         </Button>
                       </div>
                     </TableCell>
@@ -535,6 +558,101 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
             <Button onClick={handleAddParticipant}>
               <UserPlus className="h-4 w-4 mr-2" />
               {isNewUser ? "Create & Add User" : "Add Participant"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Meeting Report Dialog */}
+      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create Meeting Report</DialogTitle>
+            <DialogDescription>
+              Create an evaluation report for {selectedParticipant?.userDisplayName}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="evaluator-role">Evaluator Role *</Label>
+              <Select value={reportData.roleId} onValueChange={(value) => setReportData({...reportData, roleId: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your evaluation role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.filter(role => ['Timer', 'Ah Counter', 'Grammarian', 'General Evaluator'].includes(role.name)).map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="session">Evaluator Session</Label>
+              <Input
+                id="session"
+                value={reportData.evaluatorParticipationSession}
+                onChange={(e) => setReportData({...reportData, evaluatorParticipationSession: e.target.value})}
+                placeholder="e.g., Table Topics, Prepared Speech"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="comment1">Strengths & Positives</Label>
+              <Textarea
+                id="comment1"
+                value={reportData.comment1}
+                onChange={(e) => setReportData({...reportData, comment1: e.target.value})}
+                placeholder="What did the speaker do well?"
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="timeUsed">Time Used (HH:MM:SS)</Label>
+              <Input
+                id="timeUsed"
+                type="time"
+                step="1"
+                value={reportData.timeUsed}
+                onChange={(e) => setReportData({...reportData, timeUsed: e.target.value})}
+                placeholder="00:00:00"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="comment2">Areas for Improvement</Label>
+              <Textarea
+                id="comment2"
+                value={reportData.comment2}
+                onChange={(e) => setReportData({...reportData, comment2: e.target.value})}
+                placeholder="What could be improved for next time?"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="qualified"
+                checked={reportData.qualified}
+                onChange={(e) => setReportData({...reportData, qualified: e.target.checked})}
+                className="rounded"
+              />
+              <Label htmlFor="qualified">Met speech objectives / Qualified</Label>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => setIsReportDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitReport}>
+              <FileText className="h-4 w-4 mr-2" />
+              Create Report
             </Button>
           </div>
         </DialogContent>

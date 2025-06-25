@@ -123,11 +123,26 @@ export const learningMaterials = pgTable("learning_materials", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+// Meeting reports table (for speaker evaluations)
+export const meetingReports = pgTable("meeting_report", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  participationId: uuid("participation_id").notNull().references(() => meetingRegistration.id, { onDelete: "cascade" }),
+  roleId: uuid("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
+  evaluatorParticipationSession: text("evaluator_participation_session"),
+  comment1: text("comment_1"),
+  timeUsed: time("time_used"),
+  comment2: text("comment_2"),
+  qualified: boolean("qualified").default(false),
+  timeCreated: timestamp("time_created", { withTimezone: true }).defaultNow(),
+  createdBy: uuid("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+});
+
 // Schemas for validation
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export const insertMeetingSchema = createInsertSchema(meetings);
 export const insertReflectionSchema = createInsertSchema(reflections);
+export const insertMeetingReportSchema = createInsertSchema(meetingReports);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = z.infer<typeof selectUserSchema>;
@@ -139,3 +154,5 @@ export type InsertReflection = z.infer<typeof insertReflectionSchema>;
 export type ContentPage = typeof contentPages.$inferSelect;
 export type SpeechLog = typeof speechLog.$inferSelect;
 export type InsertSpeechLog = typeof speechLog.$inferInsert;
+export type MeetingReport = typeof meetingReports.$inferSelect;
+export type InsertMeetingReport = z.infer<typeof insertMeetingReportSchema>;

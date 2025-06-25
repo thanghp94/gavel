@@ -130,6 +130,13 @@ GavelFlow is a comprehensive web application designed for managing Toastmasters 
 - Separate development and production build processes
 
 ## Recent Changes
+- June 25, 2025: Implemented meeting report system for speaker evaluations
+- June 25, 2025: Added meeting_report table with evaluation fields (Timer, Ah Counter, Grammarian)
+- June 25, 2025: Created report button in participant actions for creating speaker evaluations
+- June 25, 2025: Built comprehensive report dialog with time tracking and feedback sections
+- June 25, 2025: Fixed DOM validation warning in MeetingDetailsDialog by replacing div with span elements
+- June 25, 2025: Made meeting details section more compact and moved to dialog description
+- June 25, 2025: Fixed database connection issues by standardizing on Neon serverless configuration
 - June 25, 2025: Fixed authentication issues for content management system
 - June 25, 2025: Created working ExCo admin account (demo@admin.com / admin123)
 - June 25, 2025: Verified content page saving with rich blocks working correctly
@@ -137,9 +144,6 @@ GavelFlow is a comprehensive web application designed for managing Toastmasters 
 - June 25, 2025: Updated database schema to support rich content blocks with JSONB storage
 - June 25, 2025: Enhanced content pages to store structured content blocks instead of plain text
 - June 25, 2025: Added support for title, text, image, video, and attachment content types
-- June 24, 2025: Fixed syntax error in API client (removed extra comma on line 127)
-- June 24, 2025: Changed "View Attendees" button to "Add Attendee" functionality in AdminMeetings
-- June 24, 2025: Added addAttendee method to API client for future attendee management
 
 ## Changelog
 - June 24, 2025. Initial setup
