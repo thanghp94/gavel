@@ -166,36 +166,36 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
         </div>
 
         {/* Participants Table */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <User className="h-5 w-5" />
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold flex items-center gap-2">
+            <User className="h-4 w-4" />
             Participants
           </h3>
           
           {loading ? (
-            <div className="text-center py-8">Loading participants...</div>
+            <div className="text-center py-4">Loading participants...</div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Speech Title</TableHead>
-                  <TableHead>Attendance</TableHead>
-                  <TableHead>Actions</TableHead>
+                <TableRow className="h-8">
+                  <TableHead className="py-2 text-xs">Name</TableHead>
+                  <TableHead className="py-2 text-xs">Role</TableHead>
+                  <TableHead className="py-2 text-xs">Speech Title</TableHead>
+                  <TableHead className="py-2 text-xs">Attendance</TableHead>
+                  <TableHead className="py-2 text-xs">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {participants.map((participant) => (
-                  <TableRow key={participant.id}>
-                    <TableCell>
-                      <div className="font-medium">{participant.userDisplayName}</div>
+                  <TableRow key={participant.id} className="h-10">
+                    <TableCell className="py-1">
+                      <div className="font-medium text-sm">{participant.userDisplayName}</div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-1">
                       {editingParticipant?.id === participant.id ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
-                            <SelectTrigger className="w-48">
+                            <SelectTrigger className="w-36 h-7 text-xs">
                               <SelectValue placeholder="Select role" />
                             </SelectTrigger>
                             <SelectContent>
@@ -207,43 +207,45 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
                               ))}
                             </SelectContent>
                           </Select>
-                          <Button size="sm" onClick={handleSaveRole}>
+                          <Button size="sm" onClick={handleSaveRole} className="h-7 px-2 text-xs">
                             Save
                           </Button>
                           <Button 
                             size="sm" 
                             variant="outline" 
                             onClick={() => setEditingParticipant(null)}
+                            className="h-7 px-2 text-xs"
                           >
                             Cancel
                           </Button>
                         </div>
                       ) : (
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="text-xs">
                           {participant.roleName || 'No Role'}
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <span className="text-sm">
+                    <TableCell className="py-1">
+                      <span className="text-xs">
                         {participant.speechTitle || '-'}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      <Badge className={getAttendanceColor(participant.attendanceStatus)}>
+                    <TableCell className="py-1">
+                      <Badge className={getAttendanceColor(participant.attendanceStatus)} size="sm">
                         {participant.attendanceStatus}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
+                    <TableCell className="py-1">
+                      <div className="flex items-center gap-1">
                         {editingParticipant?.id !== participant.id && (
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEditRole(participant)}
                             title="Edit Role"
+                            className="h-6 w-6 p-0"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-3 w-3" />
                           </Button>
                         )}
                         <Button
@@ -251,8 +253,9 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
                           size="sm"
                           onClick={() => handleAttendanceCheck(participant.id, participant.attendanceStatus)}
                           title="Toggle Attendance"
+                          className="h-6 w-6 p-0"
                         >
-                          <CheckSquare className="h-4 w-4" />
+                          <CheckSquare className="h-3 w-3" />
                         </Button>
                       </div>
                     </TableCell>
@@ -263,7 +266,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
           )}
           
           {participants.length === 0 && !loading && (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-4 text-gray-500 text-sm">
               No participants registered for this meeting
             </div>
           )}
