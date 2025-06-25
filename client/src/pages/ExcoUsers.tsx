@@ -20,6 +20,7 @@ interface User {
   dateOfBirth: string;
   school: string;
   gender: string;
+  phoneNumber: string;
   role: string;
   isActive: boolean;
   createdAt: string;
@@ -38,6 +39,7 @@ const ExcoUsers = () => {
     dateOfBirth: "",
     school: "",
     gender: "",
+    phoneNumber: '',
     role: "member",
   });
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -115,7 +117,7 @@ const ExcoUsers = () => {
         description: `User created successfully. Temporary password: ${data.tempPassword}`,
       });
       setIsAddDialogOpen(false);
-      setNewUser({ email: "", displayName: "", fullName: "", dateOfBirth: "", school: "", gender: "", role: "member" });
+      setNewUser({ email: "", displayName: "", fullName: "", dateOfBirth: "", school: "", gender: "", phoneNumber: '', role: "member" });
       fetchUsers(); // Refresh the users list
     } catch (error) {
       console.error('Failed to create user:', error);
@@ -279,6 +281,15 @@ const ExcoUsers = () => {
                             placeholder="University Name"
                           />
                         </div>
+                         <div>
+                          <Label htmlFor="phoneNumber">Phone Number</Label>
+                          <Input
+                            id="phoneNumber"
+                            value={newUser.phoneNumber}
+                            onChange={(e) => setNewUser({ ...newUser, phoneNumber: e.target.value })}
+                            placeholder="Phone Number"
+                          />
+                        </div>
                         <div>
                           <Label htmlFor="gender">Gender</Label>
                           <Select value={newUser.gender} onValueChange={(value) => setNewUser({ ...newUser, gender: value })}>
@@ -301,6 +312,7 @@ const ExcoUsers = () => {
                             <SelectContent>
                               <SelectItem value="member">Member</SelectItem>
                               <SelectItem value="exco">ExCo</SelectItem>
+                              <SelectItem value="guest">Guest</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -338,19 +350,21 @@ const ExcoUsers = () => {
                       <TableHead>Email</TableHead>
                       <TableHead>School</TableHead>
                       <TableHead>Gender</TableHead>
+                      <TableHead>Phone</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
+                    {filteredUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">{user.displayName}</TableCell>
                         <TableCell>{user.fullName}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.school || '-'}</TableCell>
                         <TableCell>{user.gender || '-'}</TableCell>
+                         <TableCell>{user.phoneNumber || '-'}</TableCell>
                         <TableCell>
                           <Select 
                             value={user.role} 
@@ -362,6 +376,7 @@ const ExcoUsers = () => {
                             <SelectContent>
                               <SelectItem value="member">Member</SelectItem>
                               <SelectItem value="exco">ExCo</SelectItem>
+                              <SelectItem value="guest">Guest</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>

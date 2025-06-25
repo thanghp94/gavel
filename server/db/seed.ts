@@ -53,16 +53,18 @@ async function seed() {
         dateOfBirth: '1990-05-15',
         school: 'National University of Singapore',
         gender: 'Female',
+        phoneNumber: '+84 123 456 789',
         role: 'exco',
       },
       {
-        email: 'john.doe@example.com',
+        email: 'member@gavelflow.com',
         passwordHash: await bcrypt.hash('member123', 10),
         displayName: 'John Doe',
         fullName: 'John Doe',
         dateOfBirth: '1992-08-22',
         school: 'Nanyang Technological University',
         gender: 'Male',
+        phoneNumber: '+84 987 654 321',
         role: 'member',
       },
       {
@@ -73,7 +75,19 @@ async function seed() {
         dateOfBirth: '1988-12-03',
         school: 'Singapore Management University',
         gender: 'Female',
+        phoneNumber: '+84 111 222 333',
         role: 'member',
+      },
+      {
+        email: 'guest@gavelflow.com',
+        passwordHash: await bcrypt.hash('guest123', 10),
+        displayName: 'Tom Wilson',
+        fullName: 'Tom Wilson',
+        dateOfBirth: '1995-03-10',
+        school: 'Visiting Student',
+        gender: 'Male',
+        phoneNumber: '+84 555 666 777',
+        role: 'guest',
       },
       {
         email: 'michael.smith@example.com',
@@ -83,6 +97,7 @@ async function seed() {
         dateOfBirth: '1995-02-18',
         school: 'SUTD',
         gender: 'Male',
+        phoneNumber: '+84 444 555 666',
         role: 'member',
       },
       {
@@ -93,6 +108,7 @@ async function seed() {
         dateOfBirth: '1993-07-11',
         school: 'SIT',
         gender: 'Female',
+        phoneNumber: '+84 777 888 999',
         role: 'member',
       },
       {
@@ -103,6 +119,7 @@ async function seed() {
         dateOfBirth: '1991-11-25',
         school: 'NTU',
         gender: 'Male',
+        phoneNumber: '+84 321 654 987',
         role: 'member',
       },
       {
@@ -113,6 +130,7 @@ async function seed() {
         dateOfBirth: '1994-04-08',
         school: 'SMU',
         gender: 'Female',
+        phoneNumber: '+84 159 753 486',
         role: 'member',
       },
       {
@@ -123,6 +141,7 @@ async function seed() {
         dateOfBirth: '1987-12-20',
         school: 'NUS',
         gender: 'Male',
+        phoneNumber: '+84 246 810 135',
         role: 'member',
       }
     ];
