@@ -28,6 +28,14 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
   const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [addParticipantRoleId, setAddParticipantRoleId] = useState("");
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [newUserData, setNewUserData] = useState({
+    email: "",
+    displayName: "",
+    fullName: "",
+    school: "",
+    gender: ""
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -139,37 +147,87 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
   };
 
   const handleAddParticipant = async () => {
-    if (!selectedUserId || selectedUserId === "none") {
-      toast({
-        title: "Error",
-        description: "Please select a user to add",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (isNewUser) {
+      if (!newUserData.email || !newUserData.displayName) {
+        toast({
+          title: "Error",
+          description: "Email and Display Name are required for new users",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    try {
-      const finalRoleId = addParticipantRoleId === "no-role" ? undefined : addParticipantRoleId;
-      await api.addAttendee(meetingId, selectedUserId, finalRoleId);
-      
-      // Refresh participants list
-      await fetchParticipants();
-      
-      // Reset form and close dialog
-      setSelectedUserId("");
-      setAddParticipantRoleId("");
-      setIsAddParticipantOpen(false);
-      
-      toast({
-        title: "Success",
-        description: "Participant added successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add participant",
-        variant: "destructive",
-      });
+      try {
+        // Create the new user as a guest
+        const newUser = await api.createUser({
+          ...newUserData,
+          role: "guest",
+        });
+
+        // Add the new user as an attendee
+        const finalRoleId = addParticipantRoleId === "no-role" ? undefined : addParticipantRoleId;
+        await api.addAttendee(meetingId, newUser.user.id, finalRoleId);
+
+        // Refresh participants list
+        await fetchParticipants();
+
+        // Reset form and close dialog
+        setSelectedUserId("");
+        setAddParticipantRoleId("");
+        setIsNewUser(false);
+        setNewUserData({
+          email: "",
+          displayName: "",
+          fullName: "",
+          school: "",
+          gender: ""
+        });
+        setIsAddParticipantOpen(false);
+
+        toast({
+          title: "Success",
+          description: "New guest user created and added as participant successfully",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to create and add participant",
+          variant: "destructive",
+        });
+      }
+    } else {
+      if (!selectedUserId || selectedUserId === "none") {
+        toast({
+          title: "Error",
+          description: "Please select a user to add",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        const finalRoleId = addParticipantRoleId === "no-role" ? undefined : addParticipantRoleId;
+        await api.addAttendee(meetingId, selectedUserId, finalRoleId);
+        
+        // Refresh participants list
+        await fetchParticipants();
+        
+        // Reset form and close dialog
+        setSelectedUserId("");
+        setAddParticipantRoleId("");
+        setIsAddParticipantOpen(false);
+        
+        toast({
+          title: "Success",
+          description: "Participant added successfully",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to add participant",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -355,24 +413,95 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="user-select">Select User</Label>
-              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a user" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Select a user...</SelectItem>
-                  {users
-                    .filter(user => !participants.some(p => p.userId === user.id))
-                    .map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.displayName} ({user.email})
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="new-user-checkbox"
+                checked={isNewUser}
+                onChange={(e) => setIsNewUser(e.target.checked)}
+                className="rounded"
+              />
+              <Label htmlFor="new-user-checkbox">Create new guest user</Label>
             </div>
+
+            {isNewUser ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={newUserData.email}
+                      onChange={(e) => setNewUserData({...newUserData, email: e.target.value})}
+                      placeholder="john.doe@example.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="displayName">Display Name *</Label>
+                    <Input
+                      id="displayName"
+                      value={newUserData.displayName}
+                      onChange={(e) => setNewUserData({...newUserData, displayName: e.target.value})}
+                      placeholder="John Doe"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      value={newUserData.fullName}
+                      onChange={(e) => setNewUserData({...newUserData, fullName: e.target.value})}
+                      placeholder="John Michael Doe"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="school">School</Label>
+                    <Input
+                      id="school"
+                      value={newUserData.school}
+                      onChange={(e) => setNewUserData({...newUserData, school: e.target.value})}
+                      placeholder="University of Technology"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select value={newUserData.gender} onValueChange={(value) => setNewUserData({...newUserData, gender: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="user-select">Select User</Label>
+                <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a user" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Select a user...</SelectItem>
+                    {users
+                      .filter(user => !participants.some(p => p.userId === user.id))
+                      .map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.displayName} ({user.email})
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="role-select">Select Role (Optional)</Label>
@@ -398,7 +527,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
             </Button>
             <Button onClick={handleAddParticipant}>
               <UserPlus className="h-4 w-4 mr-2" />
-              Add Participant
+              {isNewUser ? "Create & Add User" : "Add Participant"}
             </Button>
           </div>
         </DialogContent>
