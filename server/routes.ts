@@ -235,6 +235,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+    // Update meeting
+  app.put('/api/meetings/:id', authenticateToken, async (req, res) => {
+    try {
+      const meetingId = req.params.id;
+      const meetingData = insertMeetingSchema.parse(req.body);
+
+      const updatedMeeting = await storage.updateMeeting(meetingId, meetingData);
+
+      if (!updatedMeeting) {
+        return res.status(404).json({ message: 'Meeting not found' });
+      }
+
+      res.json(updatedMeeting);
+    } catch (error) {
+      console.error('Error updating meeting:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
   // Role routes
   app.get("/api/roles", authenticateToken, async (req, res) => {
     try {
@@ -293,17 +312,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!page) {
         return res.status(404).json({ message: "Page not found" });
       }
-      
+
       // Check if page is published or if user is authenticated as ExCo for preview
       if (!page.isPublished) {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
-        
+
         if (token) {
           try {
             const decoded = jwt.verify(token, JWT_SECRET) as any;
             const user = await storage.getUser(decoded.userId);
-            
+
             if (!user || user.role !== 'exco') {
               return res.status(404).json({ message: "Page not found" });
             }
@@ -314,7 +333,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Page not found" });
         }
       }
-      
+
       res.json(page);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch page" });

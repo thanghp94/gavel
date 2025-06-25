@@ -20,6 +20,7 @@ const AdminMeetings = () => {
   const { toast } = useToast();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddAttendeeDialogOpen, setIsAddAttendeeDialogOpen] = useState(false);
   const [isMeetingDetailsOpen, setIsMeetingDetailsOpen] = useState(false);
   const [selectedMeetingId, setSelectedMeetingId] = useState("");
@@ -30,6 +31,16 @@ const AdminMeetings = () => {
   const [selectedRoleId, setSelectedRoleId] = useState("no-role");
 
   const [newMeeting, setNewMeeting] = useState({
+    title: "",
+    date: "",
+    time: "",
+    location: "",
+    theme: "",
+    description: ""
+  });
+
+  const [editMeeting, setEditMeeting] = useState({
+    id: "",
     title: "",
     date: "",
     time: "",
@@ -106,12 +117,45 @@ const AdminMeetings = () => {
   };
 
   const handleEditMeeting = (meetingId: string) => {
-    // Open edit dialog or navigate to edit page
-    console.log("Edit meeting:", meetingId);
-    toast({
-      title: "Info",
-      description: "Meeting edit functionality not implemented yet",
-    });
+    const meeting = meetings.find(m => m.id === meetingId);
+    if (meeting) {
+      setEditMeeting({
+        id: meeting.id,
+        title: meeting.title,
+        date: meeting.date,
+        time: meeting.time,
+        location: meeting.location,
+        theme: meeting.theme,
+        description: meeting.description || ""
+      });
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleUpdateMeeting = async () => {
+    try {
+      const updatedMeeting = await api.updateMeeting(editMeeting.id, {
+        title: editMeeting.title,
+        date: editMeeting.date,
+        time: editMeeting.time,
+        location: editMeeting.location,
+        theme: editMeeting.theme,
+        description: editMeeting.description
+      });
+      
+      setMeetings(meetings.map(m => m.id === editMeeting.id ? updatedMeeting : m));
+      setIsEditDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Meeting updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update meeting",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAddAttendee = (meetingId: string) => {
@@ -430,6 +474,91 @@ const AdminMeetings = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Edit Meeting Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Meeting</DialogTitle>
+              <DialogDescription>
+                Update the meeting details
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-title">Meeting Title</Label>
+                  <Input
+                    id="edit-title"
+                    value={editMeeting.title}
+                    onChange={(e) => setEditMeeting({...editMeeting, title: e.target.value})}
+                    placeholder="Weekly Meeting #25"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-theme">Theme</Label>
+                  <Input
+                    id="edit-theme"
+                    value={editMeeting.theme}
+                    onChange={(e) => setEditMeeting({...editMeeting, theme: e.target.value})}
+                    placeholder="Leadership Excellence"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-date">Date</Label>
+                  <Input
+                    id="edit-date"
+                    type="date"
+                    value={editMeeting.date}
+                    onChange={(e) => setEditMeeting({...editMeeting, date: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-time">Time</Label>
+                  <Input
+                    id="edit-time"
+                    type="time"
+                    value={editMeeting.time}
+                    onChange={(e) => setEditMeeting({...editMeeting, time: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-location">Location</Label>
+                  <Input
+                    id="edit-location"
+                    value={editMeeting.location}
+                    onChange={(e) => setEditMeeting({...editMeeting, location: e.target.value})}
+                    placeholder="Conference Room A"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editMeeting.description}
+                  onChange={(e) => setEditMeeting({...editMeeting, description: e.target.value})}
+                  placeholder="Meeting description and agenda notes..."
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateMeeting}>
+                Update Meeting
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Add Attendee Dialog */}
         <Dialog open={isAddAttendeeDialogOpen} onOpenChange={setIsAddAttendeeDialogOpen}>

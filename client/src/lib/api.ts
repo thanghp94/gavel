@@ -67,6 +67,13 @@ class ApiClient {
     });
   }
 
+  async updateMeeting(id: string, meeting: any) {
+    return this.request<any>(`/meetings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(meeting),
+    });
+  }
+
   // Role methods
   async getRoles() {
     return this.request<any[]>('/roles');
