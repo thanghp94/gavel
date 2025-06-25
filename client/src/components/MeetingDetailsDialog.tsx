@@ -34,7 +34,8 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     displayName: "",
     fullName: "",
     school: "",
-    gender: ""
+    gender: "",
+    phone: ""
   });
   const { toast } = useToast();
 
@@ -180,7 +181,8 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
           displayName: "",
           fullName: "",
           school: "",
-          gender: ""
+          gender: "",
+          phone: ""
         });
         setIsAddParticipantOpen(false);
 
@@ -458,14 +460,23 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="school">School</Label>
+                    <Label htmlFor="phone">Phone</Label>
                     <Input
-                      id="school"
-                      value={newUserData.school}
-                      onChange={(e) => setNewUserData({...newUserData, school: e.target.value})}
-                      placeholder="University of Technology"
+                      id="phone"
+                      value={newUserData.phone}
+                      onChange={(e) => setNewUserData({...newUserData, phone: e.target.value})}
+                      placeholder="+1234567890"
                     />
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="school">School</Label>
+                  <Input
+                    id="school"
+                    value={newUserData.school}
+                    onChange={(e) => setNewUserData({...newUserData, school: e.target.value})}
+                    placeholder="University of Technology"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gender</Label>
