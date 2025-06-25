@@ -154,54 +154,42 @@ const ExcoDashboard = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
               <CardTitle className="text-sm font-medium">Total Members</CardTitle>
               <Users className="h-4 w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0">
               <div className="text-2xl font-bold">{dashboardStats.totalMembers}</div>
-              <p className="text-xs text-blue-100">
-                +3 new this month
-              </p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
               <CardTitle className="text-sm font-medium">Active Meetings</CardTitle>
               <Calendar className="h-4 w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0">
               <div className="text-2xl font-bold">{dashboardStats.activeMeetings}</div>
-              <p className="text-xs text-green-100">
-                This month
-              </p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
               <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
               <AlertCircle className="h-4 w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0">
               <div className="text-2xl font-bold">{dashboardStats.pendingTasks}</div>
-              <p className="text-xs text-orange-100">
-                2 high priority
-              </p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
               <CardTitle className="text-sm font-medium">Reflections</CardTitle>
               <FileText className="h-4 w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0">
               <div className="text-2xl font-bold">{dashboardStats.completedReflections}</div>
-              <p className="text-xs text-purple-100">
-                This week
-              </p>
             </CardContent>
           </Card>
         </div>
