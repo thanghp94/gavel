@@ -216,19 +216,22 @@ const ExcoDashboard = () => {
                   <div
                     key={meeting.id}
                     onClick={() => handleViewMeeting(meeting)}
-                    className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border"
+                    className="p-2 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 text-sm truncate">{meeting.title}</h4>
-                        <p className="text-xs text-gray-600 mt-1">{meeting.theme}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs text-gray-500">
-                            {new Date(meeting.date).toLocaleDateString()}
-                          </span>
-                          <Badge className={getStatusColor(meeting.status)} variant="secondary">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-medium text-gray-900 text-sm truncate">{meeting.title}</h4>
+                          <Badge className={getStatusColor(meeting.status)} variant="secondary" size="sm">
                             {meeting.status}
                           </Badge>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-gray-600">
+                          <span>{meeting.theme}</span>
+                          <span>•</span>
+                          <span>
+                            {new Date(meeting.date).toLocaleDateString('en-GB')}
+                          </span>
                         </div>
                       </div>
                       <Eye className="h-4 w-4 text-gray-400 ml-2" />
