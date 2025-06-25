@@ -137,12 +137,49 @@ export const meetingReports = pgTable("meeting_report", {
   createdBy: uuid("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
 });
 
+// Teams table
+export const teams = pgTable("teams", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 100 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // 'membership' or 'academic'
+  description: text("description"),
+  leaderId: uuid("leader_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// Team members table
+export const teamMembers = pgTable("team_members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  teamId: uuid("team_id").notNull().references(() => teams.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 50 }).default("member"), // 'leader', 'member'
+  joinedAt: timestamp("joined_at", { withTimezone: true }).defaultNow(),
+});
+
+// Tasks table
+export const tasks = pgTable("tasks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  status: varchar("status", { length: 50 }).notNull().default("todo"), // 'todo', 'in-progress', 'done'
+  priority: varchar("priority", { length: 20 }).notNull().default("medium"), // 'low', 'medium', 'high'
+  assigneeId: uuid("assignee_id").references(() => users.id, { onDelete: "set null" }),
+  teamId: uuid("team_id").references(() => teams.id, { onDelete: "set null" }),
+  dueDate: date("due_date"),
+  labels: json("labels").default([]),
+  createdBy: uuid("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 // Schemas for validation
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export const insertMeetingSchema = createInsertSchema(meetings);
 export const insertReflectionSchema = createInsertSchema(reflections);
 export const insertMeetingReportSchema = createInsertSchema(meetingReports);
+export const insertTeamSchema = createInsertSchema(teams);
+export const insertTaskSchema = createInsertSchema(tasks);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = z.infer<typeof selectUserSchema>;
@@ -156,3 +193,8 @@ export type SpeechLog = typeof speechLog.$inferSelect;
 export type InsertSpeechLog = typeof speechLog.$inferInsert;
 export type MeetingReport = typeof meetingReports.$inferSelect;
 export type InsertMeetingReport = z.infer<typeof insertMeetingReportSchema>;
+export type Team = typeof teams.$inferSelect;
+export type InsertTeam = z.infer<typeof insertTeamSchema>;
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type TeamMember = typeof teamMembers.$inferSelect;
