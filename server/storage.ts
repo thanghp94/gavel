@@ -429,7 +429,7 @@ export class DatabaseStorage implements IStorage {
 
   // Task methods
   async getTasks(teamId?: string): Promise<Task[]> {
-    let query = db
+    let baseQuery = db
       .select({
         id: tasks.id,
         title: tasks.title,
@@ -442,6 +442,7 @@ export class DatabaseStorage implements IStorage {
         labels: tasks.labels,
         createdAt: tasks.createdAt,
         updatedAt: tasks.updatedAt,
+        createdBy: tasks.createdBy,
         assignee: {
           id: users.id,
           displayName: users.displayName
@@ -456,11 +457,9 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(tasks.assigneeId, users.id))
       .leftJoin(teams, eq(tasks.teamId, teams.id));
 
-    if (teamId) {
-      query = query.where(eq(tasks.teamId, teamId));
-    }
-
-    const result = await query;
+    const result = teamId 
+      ? await baseQuery.where(eq(tasks.teamId, teamId))
+      : await baseQuery;
 
     return result.map(row => ({
       id: row.id,
@@ -472,8 +471,9 @@ export class DatabaseStorage implements IStorage {
       teamId: row.teamId,
       dueDate: row.dueDate || '',
       labels: Array.isArray(row.labels) ? row.labels : [],
-      createdAt: row.createdAt?.toISOString(),
-      updatedAt: row.updatedAt?.toISOString(),
+      createdAt: row.createdAt || null,
+      updatedAt: row.updatedAt || null,
+      createdBy: row.createdBy,
       assignee: row.assignee?.id ? row.assignee : undefined,
       team: row.team?.id ? row.team : undefined
     }));
