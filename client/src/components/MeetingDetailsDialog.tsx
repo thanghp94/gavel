@@ -146,7 +146,11 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-gray-600">
               <Calendar className="h-4 w-4" />
-              <span>{new Date(meeting.date).toLocaleDateString()}</span>
+              <span>{new Date(meeting.date).toLocaleDateString('en-GB', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: '2-digit' 
+              })}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <Clock className="h-4 w-4" />
@@ -166,7 +170,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
         </div>
 
         {/* Participants Table */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <h3 className="text-base font-semibold flex items-center gap-2">
             <User className="h-4 w-4" />
             Participants
