@@ -71,6 +71,18 @@ export const meetingRegistration = pgTable("meeting_registration", {
   speechObjectives: text("speech_objectives"),
 });
 
+// Speech log table (linked to meeting registration)
+export const speechLog = pgTable("speech_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  speechName: varchar("speech_name", { length: 255 }).notNull(),
+  userSpeechNumber: varchar("user_speech_number", { length: 50 }),
+  speechOrder: varchar("speech_order", { length: 50 }),
+  createdBy: uuid("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 // Reflections table
 export const reflections = pgTable("reflections", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -121,3 +133,5 @@ export type Role = typeof roles.$inferSelect;
 export type Reflection = typeof reflections.$inferSelect;
 export type InsertReflection = z.infer<typeof insertReflectionSchema>;
 export type ContentPage = typeof contentPages.$inferSelect;
+export type SpeechLog = typeof speechLog.$inferSelect;
+export type InsertSpeechLog = typeof speechLog.$inferInsert;
