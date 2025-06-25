@@ -303,10 +303,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           try {
             const decoded = jwt.verify(token, JWT_SECRET) as any;
             const user = await storage.getUser(decoded.userId);
+            
             if (!user || user.role !== 'exco') {
               return res.status(404).json({ message: "Page not found" });
             }
-          } catch {
+          } catch (error) {
             return res.status(404).json({ message: "Page not found" });
           }
         } else {
