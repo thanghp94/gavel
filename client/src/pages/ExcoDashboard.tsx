@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,9 +13,12 @@ import {
   AlertCircle,
   Clock,
   BookOpen,
-  Globe
+  Globe,
+  Eye
 } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
+import { MeetingDetailsDialog } from "@/components/MeetingDetailsDialog";
+import { api } from "@/lib/api";
 
 const ExcoDashboard = () => {
   const [dashboardStats] = useState({
@@ -24,6 +27,45 @@ const ExcoDashboard = () => {
     pendingTasks: 7,
     completedReflections: 12
   });
+
+  const [meetings, setMeetings] = useState([]);
+  const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMeetings = async () => {
+      try {
+        const meetingsData = await api.getMeetings();
+        // Sort by date and limit to 5 most recent
+        const sortedMeetings = meetingsData
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5);
+        setMeetings(sortedMeetings);
+      } catch (error) {
+        console.error('Failed to fetch meetings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMeetings();
+  }, []);
+
+  const handleViewMeeting = async (meeting) => {
+    console.log('View meeting:', meeting.id);
+    setSelectedMeeting(meeting);
+    setIsDetailsDialogOpen(true);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'upcoming': return 'bg-blue-100 text-blue-700';
+      case 'completed': return 'bg-green-100 text-green-700';
+      case 'cancelled': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
 
   const recentActivities = [
     {
@@ -164,37 +206,50 @@ const ExcoDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Quick Actions */}
+          {/* Recent Meetings */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-blue-600" />
-                Quick Actions
+                <Calendar className="h-5 w-5 text-blue-600" />
+                Recent Meetings
               </CardTitle>
               <CardDescription>
-                Common administrative tasks
+                Click on any meeting to view details
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white">
+              {loading ? (
+                <div className="text-center text-gray-500">Loading meetings...</div>
+              ) : meetings.length === 0 ? (
+                <div className="text-center text-gray-500">No meetings found</div>
+              ) : (
+                meetings.map((meeting) => (
+                  <div
+                    key={meeting.id}
+                    onClick={() => handleViewMeeting(meeting)}
+                    className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 text-sm truncate">{meeting.title}</h4>
+                        <p className="text-xs text-gray-600 mt-1">{meeting.theme}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs text-gray-500">
+                            {new Date(meeting.date).toLocaleDateString()}
+                          </span>
+                          <Badge className={getStatusColor(meeting.status)} variant="secondary">
+                            {meeting.status}
+                          </Badge>
+                        </div>
+                      </div>
+                      <Eye className="h-4 w-4 text-gray-400 ml-2" />
+                    </div>
+                  </div>
+                ))
+              )}
+              <Button className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white">
                 <Calendar className="h-4 w-4 mr-2" />
-                Schedule New Meeting
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Users className="h-4 w-4 mr-2" />
-                Manage Members
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <BookOpen className="h-4 w-4 mr-2" />
-                Update Role Content
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Globe className="h-4 w-4 mr-2" />
-                Edit Public Pages
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                View Analytics
+                View All Meetings
               </Button>
             </CardContent>
           </Card>
@@ -273,6 +328,18 @@ const ExcoDashboard = () => {
           </Card>
         </div>
       </main>
+
+      {/* Meeting Details Dialog */}
+      {selectedMeeting && (
+        <MeetingDetailsDialog
+          meeting={selectedMeeting}
+          isOpen={isDetailsDialogOpen}
+          onClose={() => {
+            setIsDetailsDialogOpen(false);
+            setSelectedMeeting(null);
+          }}
+        />
+      )}
     </div>
   );
 };
