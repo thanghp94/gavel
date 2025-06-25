@@ -171,10 +171,27 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
 
         {/* Participants Table */}
         <div className="space-y-2">
-          <h3 className="text-base font-semibold flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Participants
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-base font-semibold flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Participants
+            </h3>
+            <Button 
+              size="sm" 
+              onClick={() => {
+                // You can add your add participant logic here
+                // For now, this will just show a placeholder action
+                toast({
+                  title: "Add Participant",
+                  description: "Add participant functionality would go here",
+                });
+              }}
+              className="h-8 px-3 text-xs"
+            >
+              <Users className="h-3 w-3 mr-1" />
+              Add New Participant
+            </Button>
+          </div>
           
           {loading ? (
             <div className="text-center py-4">Loading participants...</div>
