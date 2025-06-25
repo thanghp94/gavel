@@ -429,53 +429,20 @@ export class DatabaseStorage implements IStorage {
 
   // Task methods
   async getTasks(teamId?: string): Promise<Task[]> {
-    let query = db
-      .select({
-        id: tasks.id,
-        title: tasks.title,
-        description: tasks.description,
-        status: tasks.status,
-        priority: tasks.priority,
-        assigneeId: tasks.assigneeId,
-        teamId: tasks.teamId,
-        dueDate: tasks.dueDate,
-        labels: tasks.labels,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-        assignee: {
-          id: users.id,
-          displayName: users.displayName
-        },
-        team: {
-          id: teams.id,
-          name: teams.name,
-          type: teams.type
-        }
-      })
+    const query = db
+      .select()
       .from(tasks)
       .leftJoin(users, eq(tasks.assigneeId, users.id))
       .leftJoin(teams, eq(tasks.teamId, teams.id));
 
-    if (teamId) {
-      query = query.where(eq(tasks.teamId, teamId));
-    }
-
-    const result = await query;
+    const result = teamId 
+      ? await query.where(eq(tasks.teamId, teamId))
+      : await query;
 
     return result.map(row => ({
-      id: row.id,
-      title: row.title,
-      description: row.description || '',
-      status: row.status,
-      priority: row.priority,
-      assigneeId: row.assigneeId,
-      teamId: row.teamId,
-      dueDate: row.dueDate || '',
-      labels: Array.isArray(row.labels) ? row.labels : [],
-      createdAt: row.createdAt?.toISOString(),
-      updatedAt: row.updatedAt?.toISOString(),
-      assignee: row.assignee?.id ? row.assignee : undefined,
-      team: row.team?.id ? row.team : undefined
+      ...row.tasks,
+      assignee: row.users ? { id: row.users.id, displayName: row.users.displayName } : undefined,
+      team: row.teams ? { id: row.teams.id, name: row.teams.name, type: row.teams.type } : undefined
     }));
   }
 

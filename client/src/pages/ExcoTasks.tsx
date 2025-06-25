@@ -1,9 +1,16 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
+import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 import { 
   Plus, 
   Calendar, 
@@ -18,66 +25,118 @@ interface Task {
   id: string;
   title: string;
   description: string;
-  assignee: string;
-  dueDate: string;
-  priority: 'low' | 'medium' | 'high';
   status: 'todo' | 'in-progress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  assigneeId?: string;
+  teamId?: string;
+  assignee?: { id: string; displayName: string };
+  team?: { id: string; name: string; type: string };
+  dueDate: string;
   labels: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const ExcoTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: '1',
-      title: 'Update club website content',
-      description: 'Review and update the main page content with latest club information',
-      assignee: 'Mike Chen',
-      dueDate: '2024-06-28',
-      priority: 'high',
-      status: 'todo',
-      labels: ['Website', 'Content']
-    },
-    {
-      id: '2',
-      title: 'Prepare evaluation forms',
-      description: 'Create forms for member speech evaluations',
-      assignee: 'Lisa Park',
-      dueDate: '2024-06-30',
-      priority: 'medium',
-      status: 'in-progress',
-      labels: ['Forms', 'Evaluation']
-    },
-    {
-      id: '3',
-      title: 'Review member feedback',
-      description: 'Analyze feedback from last meeting and prepare summary',
-      assignee: 'John Smith',
-      dueDate: '2024-07-02',
-      priority: 'low',
-      status: 'todo',
-      labels: ['Feedback', 'Analysis']
-    },
-    {
-      id: '4',
-      title: 'Schedule guest speaker',
-      description: 'Contact and confirm guest speaker for next month',
-      assignee: 'Sarah Johnson',
-      dueDate: '2024-06-25',
-      priority: 'high',
-      status: 'done',
-      labels: ['Speaker', 'Event']
-    },
-    {
-      id: '5',
-      title: 'Update meeting minutes template',
-      description: 'Revise the template based on recent feedback',
-      assignee: 'Mike Chen',
-      dueDate: '2024-06-29',
-      priority: 'medium',
-      status: 'in-progress',
-      labels: ['Template', 'Minutes']
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    priority: 'medium',
+    dueDate: '',
+    teamId: '',
+    assigneeId: '',
+    labels: [] as string[]
+  });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchTasks();
+    fetchTeams();
+    fetchUsers();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const data = await api.getTasks();
+      setTasks(data);
+    } catch (error) {
+      console.error('Failed to fetch tasks:', error);
     }
-  ]);
+  };
+
+  const fetchTeams = async () => {
+    try {
+      const data = await api.getTeams();
+      setTeams(data);
+    } catch (error) {
+      console.error('Failed to fetch teams:', error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const data = await api.getUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    }
+  };
+
+  const handleCreateTask = async () => {
+    if (!newTask.title.trim()) {
+      toast({
+        title: "Error",
+        description: "Task title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const taskData = {
+        title: newTask.title,
+        description: newTask.description,
+        priority: newTask.priority,
+        status: 'todo' as const,
+        dueDate: newTask.dueDate || null,
+        teamId: newTask.teamId || null,
+        assigneeId: newTask.assigneeId || null,
+        labels: newTask.labels
+      };
+
+      await api.createTask(taskData);
+      
+      // Reset form
+      setNewTask({
+        title: '',
+        description: '',
+        priority: 'medium',
+        dueDate: '',
+        teamId: '',
+        assigneeId: '',
+        labels: []
+      });
+      setIsCreateTaskOpen(false);
+      
+      // Refresh tasks
+      await fetchTasks();
+      
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create task",
+        variant: "destructive",
+      });
+    }
+  };
 
   const columns = [
     { id: 'todo', title: 'To Do', icon: AlertCircle, color: 'text-orange-600' },
@@ -124,10 +183,109 @@ const ExcoTasks = () => {
               Organize and track ExCo tasks across different stages
             </p>
           </div>
-          <Button className="bg-orange-600 hover:bg-orange-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Task
-          </Button>
+          <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-orange-600 hover:bg-orange-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Task
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Task</DialogTitle>
+                <DialogDescription>
+                  Add a new task to track progress
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="task-title">Title</Label>
+                  <Input
+                    id="task-title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Task title"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="task-description">Description</Label>
+                  <Textarea
+                    id="task-description"
+                    value={newTask.description}
+                    onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Task description..."
+                    rows={3}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="task-priority">Priority</Label>
+                    <Select value={newTask.priority} onValueChange={(value) => setNewTask(prev => ({ ...prev, priority: value }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="task-due">Due Date</Label>
+                    <Input
+                      id="task-due"
+                      type="date"
+                      value={newTask.dueDate}
+                      onChange={(e) => setNewTask(prev => ({ ...prev, dueDate: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="task-team">Team</Label>
+                    <Select value={newTask.teamId} onValueChange={(value) => setNewTask(prev => ({ ...prev, teamId: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select team (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">No Team</SelectItem>
+                        {teams.map(team => (
+                          <SelectItem key={team.id} value={team.id}>
+                            {team.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="task-assignee">Assignee</Label>
+                    <Select value={newTask.assigneeId} onValueChange={(value) => setNewTask(prev => ({ ...prev, assigneeId: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select assignee (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">No Assignee</SelectItem>
+                        {users.map(user => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.displayName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsCreateTaskOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateTask}>
+                  Create Task
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Stats */}
@@ -258,7 +416,7 @@ const ExcoTasks = () => {
                           <div className="flex items-center gap-1 text-xs text-gray-500">
                             <User className="h-3 w-3" />
                             <span className="truncate max-w-[80px]">
-                              {task.assignee.split(' ')[0]}
+                              {task.assignee?.displayName?.split(' ')[0] || 'Unassigned'}
                             </span>
                           </div>
                         </div>
