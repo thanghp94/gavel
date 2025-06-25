@@ -1,7 +1,3 @@
-The code is being modified to integrate database functionality for content pages, including loading, saving, editing, and deleting pages.
-```
-
-```replit_final_file
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Video, FileText, Users, Plus, Edit, Trash2, Eye, Upload, PenTool } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
 import ContentBlockEditor from "@/components/ContentBlockEditor";
-import { getContentPages, createContentPage, updateContentPage, deleteContentPage } from "@/lib/api";
+import { api } from "@/lib/api";
 
 const AdminContent = () => {
   const [learningPaths, setLearningPaths] = useState([
@@ -95,7 +91,7 @@ const AdminContent = () => {
 
   const loadContentPages = async () => {
     try {
-      const pages = await getContentPages();
+      const pages = await api.getContentPages();
       setContentPages(pages);
     } catch (error) {
       console.error("Error loading content pages:", error);
@@ -167,7 +163,7 @@ const AdminContent = () => {
     try {
       if (editingPage) {
         // Update existing page
-        await updateContentPage(editingPage.id, pageData);
+        await api.updateContentPage(editingPage.id, pageData);
         setContentPages(prev =>
           prev.map(page =>
             page.id === editingPage.id
@@ -177,7 +173,7 @@ const AdminContent = () => {
         );
       } else {
         // Create new page
-        const newPage = await createContentPage(pageData);
+        const newPage = await api.createContentPage(pageData);
         setContentPages(prev => [...prev, newPage]);
       }
 
@@ -192,7 +188,7 @@ const AdminContent = () => {
 
   const handleDeletePage = async (pageId: string) => {
     try {
-      await deleteContentPage(pageId);
+      await api.deleteContentPage(pageId);
       setContentPages(prev => prev.filter(page => page.id !== pageId));
     } catch (error) {
       console.error("Error deleting content page:", error);
