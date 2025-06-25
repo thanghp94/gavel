@@ -106,7 +106,7 @@ export interface IStorage {
   addTeamMember(teamId: string, userId: string, role?: string): Promise<TeamMember>;
 
   // Task methods
-  getTasks(teamId?: string): Promise<any[]>;
+  getTasks(teamId?: string): Promise<Task[]>;
   getTask(id: string): Promise<Task | undefined>;
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: string, updates: Partial<InsertTask>): Promise<Task | undefined>;
@@ -348,7 +348,7 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(roles, eq(meetingReports.roleId, roles.id))
       .leftJoin(users as any, eq(meetingReports.createdBy, users.id))
       .where(eq(meetingRegistration.meetingId, meetingId));
-    
+
     return result;
   }
 
@@ -357,7 +357,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(meetingReports)
       .where(eq(meetingReports.participationId, participationId));
-    
+
     return result;
   }
 
@@ -374,7 +374,7 @@ export class DatabaseStorage implements IStorage {
       })
       .from(teams)
       .leftJoin(users, eq(teams.leaderId, users.id));
-    
+
     return result.map(r => ({ ...r.team, leader: r.leader, memberCount: r.memberCount }));
   }
 
@@ -415,7 +415,7 @@ export class DatabaseStorage implements IStorage {
       .from(teamMembers)
       .innerJoin(users, eq(teamMembers.userId, users.id))
       .where(eq(teamMembers.teamId, teamId));
-    
+
     return result;
   }
 
@@ -428,29 +428,55 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Task methods
-  async getTasks(teamId?: string): Promise<any[]> {
-    const baseQuery = db
+  async getTasks(teamId?: string): Promise<Task[]> {
+    let query = db
       .select({
-        task: tasks,
+        id: tasks.id,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        priority: tasks.priority,
+        assigneeId: tasks.assigneeId,
+        teamId: tasks.teamId,
+        dueDate: tasks.dueDate,
+        labels: tasks.labels,
+        createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
         assignee: {
           id: users.id,
-          displayName: users.displayName,
+          displayName: users.displayName
         },
         team: {
           id: teams.id,
           name: teams.name,
-          type: teams.type,
+          type: teams.type
         }
       })
       .from(tasks)
       .leftJoin(users, eq(tasks.assigneeId, users.id))
       .leftJoin(teams, eq(tasks.teamId, teams.id));
 
-    const result = teamId 
-      ? await baseQuery.where(eq(tasks.teamId, teamId)).orderBy(tasks.createdAt)
-      : await baseQuery.orderBy(tasks.createdAt);
-      
-    return result.map(r => ({ ...r.task, assignee: r.assignee, team: r.team }));
+    if (teamId) {
+      query = query.where(eq(tasks.teamId, teamId));
+    }
+
+    const result = await query;
+
+    return result.map(row => ({
+      id: row.id,
+      title: row.title,
+      description: row.description || '',
+      status: row.status,
+      priority: row.priority,
+      assigneeId: row.assigneeId,
+      teamId: row.teamId,
+      dueDate: row.dueDate || '',
+      labels: Array.isArray(row.labels) ? row.labels : [],
+      createdAt: row.createdAt?.toISOString(),
+      updatedAt: row.updatedAt?.toISOString(),
+      assignee: row.assignee?.id ? row.assignee : undefined,
+      team: row.team?.id ? row.team : undefined
+    }));
   }
 
   async getTask(id: string): Promise<Task | undefined> {
