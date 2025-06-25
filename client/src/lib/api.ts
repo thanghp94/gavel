@@ -79,6 +79,42 @@ class ApiClient {
     return this.request<any[]>('/roles');
   }
 
+  // Task methods
+  async getTasks(teamId?: string) {
+    const url = teamId ? `/api/tasks?teamId=${teamId}` : '/api/tasks';
+    return this.request(url);
+  }
+
+  async createTask(taskData: any) {
+    return this.request('/api/tasks', {
+      method: 'POST',
+      body: JSON.stringify(taskData),
+    });
+  }
+
+  async updateTask(taskId: string, updates: any) {
+    return this.request(`/api/tasks/${taskId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+  }
+
+  // Team methods
+  async getTeams() {
+    return this.request('/api/teams');
+  }
+
+  async createTeam(teamData: any) {
+    return this.request('/api/teams', {
+      method: 'POST',
+      body: JSON.stringify(teamData),
+    });
+  }
+
+  async getTeamMembers(teamId: string) {
+    return this.request(`/api/teams/${teamId}/members`);
+  }
+
   // Reflection methods
   async createReflection(reflection: any) {
     return this.request<any>('/reflections', {
@@ -214,42 +250,6 @@ class ApiClient {
 
   async getParticipantReports(participationId: string) {
     return this.request(`/api/participants/${participationId}/reports`);
-  }
-
-  // Team methods
-  async getTeams() {
-    return this.request('/api/teams');
-  }
-
-  async createTeam(teamData: any) {
-    return this.request('/api/teams', {
-      method: 'POST',
-      body: JSON.stringify(teamData),
-    });
-  }
-
-  async getTeamMembers(teamId: string) {
-    return this.request(`/api/teams/${teamId}/members`);
-  }
-
-  // Task methods
-  async getTasks(teamId?: string) {
-    const url = teamId ? `/api/tasks?teamId=${teamId}` : '/api/tasks';
-    return this.request(url);
-  }
-
-  async createTask(taskData: any) {
-    return this.request('/api/tasks', {
-      method: 'POST',
-      body: JSON.stringify(taskData),
-    });
-  }
-
-  async updateTask(taskId: string, updates: any) {
-    return this.request(`/api/tasks/${taskId}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
   }
 
   logout() {
