@@ -103,8 +103,8 @@ const ExcoTasks = () => {
         priority: newTask.priority,
         status: 'todo' as const,
         dueDate: newTask.dueDate || null,
-        teamId: newTask.teamId || null,
-        assigneeId: newTask.assigneeId || null,
+        teamId: newTask.teamId && newTask.teamId !== 'none' ? newTask.teamId : null,
+        assigneeId: newTask.assigneeId && newTask.assigneeId !== 'none' ? newTask.assigneeId : null,
         labels: newTask.labels
       };
 
@@ -249,7 +249,7 @@ const ExcoTasks = () => {
                         <SelectValue placeholder="Select team (optional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No Team</SelectItem>
+                        <SelectItem value="none">No Team</SelectItem>
                         {teams.map(team => (
                           <SelectItem key={team.id} value={team.id}>
                             {team.name}
@@ -265,7 +265,7 @@ const ExcoTasks = () => {
                         <SelectValue placeholder="Select assignee (optional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No Assignee</SelectItem>
+                        <SelectItem value="none">No Assignee</SelectItem>
                         {users.map(user => (
                           <SelectItem key={user.id} value={user.id}>
                             {user.displayName}
