@@ -95,6 +95,9 @@ const AdminContent = () => {
       setContentPages(pages);
     } catch (error) {
       console.error("Error loading content pages:", error);
+      if (error.message?.includes('Access token required')) {
+        alert('Please log in as an ExCo member to access content management.');
+      }
     }
   };
 
@@ -182,7 +185,7 @@ const AdminContent = () => {
       loadContentPages(); // Reload pages to reflect changes
     } catch (error) {
       console.error("Error saving content page:", error);
-      // Optionally, display an error message to the user
+      alert(`Failed to save page: ${error.message || 'Unknown error'}`);
     }
   };
 
