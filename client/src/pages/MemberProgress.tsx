@@ -97,7 +97,7 @@ const MemberProgress = () => {
                     <p className="text-sm text-white/90">Speeches</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-white">{statistics.totalSpeeches}</p>
+                <p className="text-xl font-bold text-white">{statistics.totalSpeeches}</p>
               </div>
             </CardContent>
           </Card>
