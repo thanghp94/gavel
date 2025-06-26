@@ -47,9 +47,8 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Setup vite in development and after setting up all routes
+  // so the catch-all route doesn't interfere with other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
@@ -66,5 +65,31 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+  });
+
+  // Keep server alive with proper error handling
+  process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully');
+    server.close(() => {
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully');
+    server.close(() => {
+      process.exit(0);
+    });
+  });
+
+  // Prevent process from exiting unexpectedly
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    // Don't exit on uncaught exceptions in development
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Don't exit on unhandled rejections in development
   });
 })();

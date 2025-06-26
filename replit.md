@@ -130,6 +130,10 @@ GavelFlow is a comprehensive web application designed for managing Toastmasters 
 - Separate development and production build processes
 
 ## Recent Changes
+- June 26, 2025: Fixed critical preview issue caused by HMR workflow status conflicts
+- June 26, 2025: Integrated exact Meraki Gavel Club frontend design from extracted package
+- June 26, 2025: Added Meraki Education logo to navigation and footer components
+- June 26, 2025: Implemented proper server error handling to prevent preview interruptions
 - June 25, 2025: Redesigned task management system with database integration
 - June 25, 2025: Added teams, team_members, and tasks tables to support team-based organization  
 - June 25, 2025: Created separate dashboards for membership and academic teams
