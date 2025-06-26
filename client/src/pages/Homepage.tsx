@@ -2,9 +2,74 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { api } from '@/lib/api';
 import { Users, Award, Calendar, Target, ArrowRight, Star } from 'lucide-react';
+import { useState } from 'react';
 
 const Homepage = () => {
+  const { toast } = useToast();
+  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newMember, setNewMember] = useState({
+    email: '',
+    displayName: '',
+    fullName: '',
+    phone: '',
+    memberType: 'member',
+    role: 'member'
+  });
+
+  const handleCreateMember = async () => {
+    if (!newMember.email || !newMember.displayName) {
+      toast({
+        title: "Error",
+        description: "Email and Display Name are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      await api.createUser({
+        email: newMember.email,
+        displayName: newMember.displayName,
+        fullName: newMember.fullName,
+        phone: newMember.phone,
+        memberType: newMember.memberType,
+        role: newMember.role,
+      });
+
+      toast({
+        title: "Success",
+        description: "Welcome to Meraki Gavel Club! We'll contact you soon.",
+      });
+
+      setIsJoinDialogOpen(false);
+      setNewMember({
+        email: '',
+        displayName: '',
+        fullName: '',
+        phone: '',
+        memberType: 'member',
+        role: 'member'
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit your application. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const features = [
     {
       icon: Users,
@@ -57,10 +122,85 @@ const Homepage = () => {
                 a supportive community environment.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
-                  Join Our Club
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
+                      Join Our Club
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Join Meraki Gavel Club</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email*</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={newMember.email}
+                          onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+                          placeholder="your.email@example.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="displayName">Display Name*</Label>
+                        <Input
+                          id="displayName"
+                          value={newMember.displayName}
+                          onChange={(e) => setNewMember({ ...newMember, displayName: e.target.value })}
+                          placeholder="John Doe"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          value={newMember.fullName}
+                          onChange={(e) => setNewMember({ ...newMember, fullName: e.target.value })}
+                          placeholder="John Michael Doe"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          value={newMember.phone}
+                          onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
+                          placeholder="+84 123 456 789"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="memberType">Membership Type</Label>
+                        <Select value={newMember.memberType} onValueChange={(value) => setNewMember({ ...newMember, memberType: value })}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="member">Regular Member</SelectItem>
+                            <SelectItem value="guest">Guest</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex justify-end space-x-2 pt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => setIsJoinDialogOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleCreateMember}
+                          disabled={isCreating}
+                          className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500"
+                        >
+                          {isCreating ? "Submitting..." : "Join Club"}
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
                 <Button size="lg" variant="outline" className="text-white border-white bg-transparent hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
                   Learn More
                 </Button>
@@ -169,9 +309,13 @@ const Homepage = () => {
             skills that will transform your personal and professional life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
-              Become a Member
-            </Button>
+            <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
+                  Become a Member
+                </Button>
+              </DialogTrigger>
+            </Dialog>
             <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
               Contact Us
             </Button>
