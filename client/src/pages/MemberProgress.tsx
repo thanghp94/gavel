@@ -87,37 +87,79 @@ const MemberProgress = () => {
 
         {/* Statistics Overview */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">{statistics.totalSpeeches}</div>
-              <div className="text-sm text-gray-600">Speeches</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">{statistics.totalEvaluations}</div>
-              <div className="text-sm text-gray-600">Evaluations</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">{statistics.attendanceRate}%</div>
-              <div className="text-sm text-gray-600">Attendance</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600">{statistics.rolesPlayed}</div>
-              <div className="text-sm text-gray-600">Roles Played</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-yellow-600 flex items-center justify-center gap-1">
-                <Star className="h-5 w-5" />
-                {statistics.averageRating}
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Speeches</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{statistics.totalSpeeches}</p>
               </div>
-              <div className="text-sm text-gray-600">Avg Rating</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white cursor-pointer hover:from-green-600 hover:to-green-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Evaluations</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{statistics.totalEvaluations}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white cursor-pointer hover:from-orange-600 hover:to-orange-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Attendance</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{statistics.attendanceRate}%</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Target className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Roles Played</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{statistics.rolesPlayed}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white cursor-pointer hover:from-yellow-600 hover:to-yellow-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Star className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Avg Rating</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{statistics.averageRating}</p>
+              </div>
             </CardContent>
           </Card>
         </div>
