@@ -13,6 +13,7 @@ export const users = pgTable("users", {
   school: varchar("school", { length: 255 }),
   gender: varchar("gender", { length: 20 }),
   phone: varchar("phone", { length: 20 }),
+  userImage: text("user_image"),
   role: varchar("role", { length: 50 }).notNull().default("member"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   lastLogin: timestamp("last_login", { withTimezone: true }),

@@ -23,6 +23,7 @@ const Homepage = () => {
     displayName: '',
     fullName: '',
     phone: '',
+    userImage: '',
     memberType: 'member',
     role: 'member'
   });
@@ -66,6 +67,7 @@ const Homepage = () => {
         displayName: newMember.displayName,
         fullName: newMember.fullName,
         phone: newMember.phone,
+        userImage: newMember.userImage,
         memberType: newMember.memberType,
         role: newMember.role,
       });
@@ -82,6 +84,7 @@ const Homepage = () => {
         displayName: '',
         fullName: '',
         phone: '',
+        userImage: '',
         memberType: 'member',
         role: 'member'
       });
@@ -206,6 +209,33 @@ const Homepage = () => {
                           onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
                           placeholder="+84 123 456 789"
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="userImage">Profile Image</Label>
+                        <Input
+                          id="userImage"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                setNewMember({ ...newMember, userImage: event.target?.result as string });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                        {newMember.userImage && (
+                          <div className="mt-2">
+                            <img 
+                              src={newMember.userImage} 
+                              alt="Profile preview" 
+                              className="w-16 h-16 rounded-full object-cover"
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="memberType">Membership Type</Label>

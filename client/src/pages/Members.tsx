@@ -184,11 +184,19 @@ const Members = () => {
               <Card key={index} className="hover:shadow-lg transition-shadow duration-300 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                 <CardContent className="p-6">
                   <div className="text-center mb-4">
-                    <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-xl font-bold text-orange-600">
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
+                    {member.userImage ? (
+                      <img
+                        src={member.userImage}
+                        alt={member.name}
+                        className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span className="text-xl font-bold text-orange-600">
+                          {member.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                    )}
                     <h3 className="text-lg font-bold text-gray-900 mb-1">{member.name}</h3>
                     <p className="text-sm text-gray-600 mb-2">{member.profession}</p>
                     <Badge className={`text-xs ${getRoleBadgeColor(member.role)}`}>

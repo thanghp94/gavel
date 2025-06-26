@@ -60,6 +60,7 @@ export interface IStorage {
     dateOfBirth?: string;
     school?: string;
     gender?: string;
+    userImage?: string;
     role?: string;
   }): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User | undefined>;
@@ -135,6 +136,7 @@ export class DatabaseStorage implements IStorage {
     dateOfBirth?: string;
     school?: string;
     gender?: string;
+    userImage?: string;
     role?: string;
   }) {
     const result = await db.insert(users).values({
@@ -145,6 +147,7 @@ export class DatabaseStorage implements IStorage {
       dateOfBirth: userData.dateOfBirth,
       school: userData.school,
       gender: userData.gender,
+      userImage: userData.userImage,
       role: userData.role || 'member',
     }).returning();
     return result[0];

@@ -95,11 +95,19 @@ const ExComm = () => {
               <Card key={index} className="hover:shadow-lg transition-shadow duration-300 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                 <CardContent className="p-6">
                   <div className="text-center mb-4">
-                    <div className="w-20 h-20 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-orange-600">
-                        {executive.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
+                    {executive.userImage ? (
+                      <img
+                        src={executive.userImage}
+                        alt={executive.name}
+                        className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-2xl font-bold text-orange-600">
+                          {executive.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                    )}
                     <h3 className="text-xl font-bold text-gray-900 mb-1">{executive.name}</h3>
                     <Badge variant="secondary" className="mb-2 bg-teal-100 text-teal-800">
                       {executive.position}
