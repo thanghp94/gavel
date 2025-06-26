@@ -1,4 +1,3 @@
-
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { eq } from 'drizzle-orm';
@@ -784,7 +783,7 @@ Tonight we have an exciting program featuring [NUMBER] prepared speeches and eng
     console.log(`- Created ${insertedMeetings.length} meetings`);
     console.log(`- Created ${contentPagesData.length} content pages`);
     console.log(`- Created ${learningMaterialsData.length} learning materials`);
-    
+
   } catch (error) {
     console.error('Seeding failed:', error);
     throw error;
