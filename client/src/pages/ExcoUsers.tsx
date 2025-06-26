@@ -167,42 +167,54 @@ const ExcoUsers = () => {
         <div className="grid gap-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Users</p>
-                    <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+            <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 transition-colors">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Users className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-white/90">Total Users</p>
+                    </div>
                   </div>
-                  <Users className="h-8 w-8 text-blue-600 ml-auto" />
+                  <p className="text-2xl font-bold text-white">{users.length}</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Active Members</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {users.filter(u => u.isActive && u.role === 'member').length}
-                    </p>
+            <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white cursor-pointer hover:from-green-600 hover:to-green-700 transition-colors">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Badge className="h-4 w-4 text-white bg-transparent border-none p-0">M</Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm text-white/90">Active Members</p>
+                    </div>
                   </div>
-                  <Badge variant="default" className="ml-auto">Members</Badge>
+                  <p className="text-2xl font-bold text-white">
+                    {users.filter(u => u.isActive && u.role === 'member').length}
+                  </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">ExCo Members</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {users.filter(u => u.role === 'exco').length}
-                    </p>
+            <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white cursor-pointer hover:from-red-600 hover:to-red-700 transition-colors">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Badge className="h-4 w-4 text-white bg-transparent border-none p-0">E</Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm text-white/90">ExCo Members</p>
+                    </div>
                   </div>
-                  <Badge variant="destructive" className="ml-auto">ExCo</Badge>
+                  <p className="text-2xl font-bold text-white">
+                    {users.filter(u => u.role === 'exco').length}
+                  </p>
                 </div>
               </CardContent>
             </Card>
