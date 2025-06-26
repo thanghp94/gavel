@@ -34,12 +34,12 @@ const ExcoUsers = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     email: "",
-    displayName: "",
     fullName: "",
     dateOfBirth: "",
     school: "",
     gender: "",
     phone: '',
+    password: "",
     role: "member",
   });
   
@@ -100,7 +100,7 @@ const ExcoUsers = () => {
   };
 
   const createUser = async () => {
-    if (!newUser.email || !newUser.displayName) {
+    if (!newUser.email || !newUser.fullName || !newUser.password) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -117,7 +117,7 @@ const ExcoUsers = () => {
         description: `User created successfully. Temporary password: ${data.tempPassword}`,
       });
       setIsAddDialogOpen(false);
-      setNewUser({ email: "", displayName: "", fullName: "", dateOfBirth: "", school: "", gender: "", phone: '', role: "member" });
+      setNewUser({ email: "", fullName: "", dateOfBirth: "", school: "", gender: "", phone: '', password: "", role: "member" });
       fetchUsers(); // Refresh the users list
     } catch (error) {
       console.error('Failed to create user:', error);
@@ -256,15 +256,7 @@ const ExcoUsers = () => {
                             placeholder="user@example.com"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="displayName">Display Name</Label>
-                          <Input
-                            id="displayName"
-                            value={newUser.displayName}
-                            onChange={(e) => setNewUser({ ...newUser, displayName: e.target.value })}
-                            placeholder="John Doe"
-                          />
-                        </div>
+                        
                          <div>
                           <Label htmlFor="fullName">Full Name</Label>
                           <Input
@@ -272,6 +264,16 @@ const ExcoUsers = () => {
                             value={newUser.fullName}
                             onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
                             placeholder="John Doe"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="password">Password</Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            value={newUser.password || ''}
+                            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                            placeholder="Enter password"
                           />
                         </div>
                         <div>
