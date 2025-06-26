@@ -1,8 +1,10 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { api } from "@/lib/api";
 import { 
   Menu, 
   Home, 
@@ -17,6 +19,12 @@ import {
 
 export const MemberNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    api.logout();
+    navigate('/');
+  };
 
   const navigationItems = [
     { icon: Home, label: "Dashboard", href: "/member/dashboard", active: true },
@@ -82,7 +90,7 @@ export const MemberNavigation = () => {
               </div>
             </div>
 
-            <Button variant="ghost" size="sm" className="hidden md:flex">
+            <Button variant="ghost" size="sm" className="hidden md:flex" onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
             </Button>
 
@@ -112,7 +120,7 @@ export const MemberNavigation = () => {
                   </nav>
                   
                   <div className="pt-4 border-t">
-                    <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50" onClick={handleLogout}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
                     </Button>
