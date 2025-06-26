@@ -376,13 +376,15 @@ const ExcoTasks = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">To Do</p>
-                  <p className="text-2xl font-bold text-orange-600">{getTasksByStatus('todo').length}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <AlertCircle className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">To Do</p>
+                  </div>
                 </div>
-                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-4 w-4 text-orange-600" />
-                </div>
+                <p className="text-2xl font-bold text-orange-600">{getTasksByStatus('todo').length}</p>
               </div>
             </CardContent>
           </Card>
@@ -390,13 +392,15 @@ const ExcoTasks = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">In Progress</p>
-                  <p className="text-2xl font-bold text-blue-600">{getTasksByStatus('in-progress').length}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Clock className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">In Progress</p>
+                  </div>
                 </div>
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-4 w-4 text-blue-600" />
-                </div>
+                <p className="text-2xl font-bold text-blue-600">{getTasksByStatus('in-progress').length}</p>
               </div>
             </CardContent>
           </Card>
@@ -404,13 +408,15 @@ const ExcoTasks = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-green-600">{getTasksByStatus('done').length}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Completed</p>
+                  </div>
                 </div>
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                </div>
+                <p className="text-2xl font-bold text-green-600">{getTasksByStatus('done').length}</p>
               </div>
             </CardContent>
           </Card>
