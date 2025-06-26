@@ -154,42 +154,50 @@ const ExcoDashboard = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
-              <CardTitle className="text-sm font-medium">Total Members</CardTitle>
-              <Users className="h-4 w-4" />
-            </CardHeader>
-            <CardContent className="p-3 pt-0">
-              <div className="text-2xl font-bold">{dashboardStats.totalMembers}</div>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium opacity-90">Total Members</p>
+                  <p className="text-2xl font-bold">{dashboardStats.totalMembers}</p>
+                </div>
+                <Users className="h-6 w-6 opacity-80" />
+              </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
-              <CardTitle className="text-sm font-medium">Active Meetings</CardTitle>
-              <Calendar className="h-4 w-4" />
-            </CardHeader>
-            <CardContent className="p-3 pt-0">
-              <div className="text-2xl font-bold">{dashboardStats.activeMeetings}</div>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium opacity-90">Active Meetings</p>
+                  <p className="text-2xl font-bold">{dashboardStats.activeMeetings}</p>
+                </div>
+                <Calendar className="h-6 w-6 opacity-80" />
+              </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
-              <AlertCircle className="h-4 w-4" />
-            </CardHeader>
-            <CardContent className="p-3 pt-0">
-              <div className="text-2xl font-bold">{dashboardStats.pendingTasks}</div>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium opacity-90">Pending Tasks</p>
+                  <p className="text-2xl font-bold">{dashboardStats.pendingTasks}</p>
+                </div>
+                <AlertCircle className="h-6 w-6 opacity-80" />
+              </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2">
-              <CardTitle className="text-sm font-medium">Reflections</CardTitle>
-              <FileText className="h-4 w-4" />
-            </CardHeader>
-            <CardContent className="p-3 pt-0">
-              <div className="text-2xl font-bold">{dashboardStats.completedReflections}</div>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium opacity-90">Reflections</p>
+                  <p className="text-2xl font-bold">{dashboardStats.completedReflections}</p>
+                </div>
+                <FileText className="h-6 w-6 opacity-80" />
+              </div>
             </CardContent>
           </Card>
         </div>
