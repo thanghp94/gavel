@@ -142,7 +142,7 @@ const AdminMeetings = () => {
         theme: editMeeting.theme,
         description: editMeeting.description
       });
-      
+
       setMeetings(meetings.map(m => m.id === editMeeting.id ? updatedMeeting : m));
       setIsEditDialogOpen(false);
       toast({
@@ -345,7 +345,7 @@ const AdminMeetings = () => {
         {/* Meetings Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
           <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
@@ -361,7 +361,7 @@ const AdminMeetings = () => {
           </Card>
 
           <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
@@ -379,7 +379,7 @@ const AdminMeetings = () => {
           </Card>
 
           <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
