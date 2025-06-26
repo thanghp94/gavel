@@ -357,19 +357,19 @@ const ExcoUsers = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.displayName}</TableCell>
-                        <TableCell>{user.fullName}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.school || '-'}</TableCell>
-                        <TableCell>{user.gender || '-'}</TableCell>
-                         <TableCell>{user.phone || '-'}</TableCell>
-                        <TableCell>
+                      <TableRow key={user.id} className="h-12">
+                        <TableCell className="font-medium py-2 px-3 max-w-32 truncate">{user.displayName}</TableCell>
+                        <TableCell className="py-2 px-3 max-w-32 truncate">{user.fullName}</TableCell>
+                        <TableCell className="py-2 px-3 max-w-48 truncate text-sm">{user.email}</TableCell>
+                        <TableCell className="py-2 px-3 max-w-32 truncate">{user.school || '-'}</TableCell>
+                        <TableCell className="py-2 px-3 max-w-20 truncate">{user.gender || '-'}</TableCell>
+                         <TableCell className="py-2 px-3 max-w-28 truncate">{user.phone || '-'}</TableCell>
+                        <TableCell className="py-2 px-3">
                           <Select 
                             value={user.role} 
                             onValueChange={(newRole) => handleRoleChange(user.id, newRole)}
                           >
-                            <SelectTrigger className="w-24">
+                            <SelectTrigger className="w-20 h-8 text-xs">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -379,16 +379,16 @@ const ExcoUsers = () => {
                             </SelectContent>
                           </Select>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant={user.isActive ? 'default' : 'destructive'}>
+                        <TableCell className="py-2 px-3">
+                          <Badge variant={user.isActive ? 'default' : 'destructive'} className="text-xs">
                             {user.isActive ? 'Active' : 'Inactive'}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-2 px-3">
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                View Details
+                              <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
+                                View
                               </Button>
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl">
