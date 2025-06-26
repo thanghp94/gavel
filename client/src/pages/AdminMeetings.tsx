@@ -248,7 +248,6 @@ const AdminMeetings = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Meeting Management</h1>
-            <p className="text-gray-600">Create and manage club meetings</p>
           </div>
 
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
