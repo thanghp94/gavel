@@ -398,10 +398,21 @@ const AdminMeetings = () => {
         {/* Meetings Table */}
         <Card>
           <CardHeader>
-            <CardTitle>All Meetings</CardTitle>
-            <CardDescription>
-              Manage your club meetings and their details
-            </CardDescription>
+            <div className="flex justify-between items-center">
+              <CardTitle>All Meetings</CardTitle>
+              <Select>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Meetings</SelectItem>
+                  <SelectItem value="upcoming">Coming</SelectItem>
+                  <SelectItem value="club-meeting">Club Meeting</SelectItem>
+                  <SelectItem value="exco-meeting">Exco Meeting</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
