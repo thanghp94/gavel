@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Mail } from 'lucide-react';
+import { Menu, X, Phone, Mail, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navigation = () => {
@@ -50,11 +50,9 @@ const Navigation = () => {
         {/* Main navigation */}
         <div className="flex justify-between items-center py-4">
           <Link to="/" className="flex items-center space-x-3">
-            <img 
-              src="/attached_assets/Meraki Logo Tròn_1750924213028.jpg" 
-              alt="Meraki Education Logo" 
-              className="h-12 w-12 object-contain rounded-full"
-            />
+            <div className="h-12 w-12 bg-gradient-to-br from-teal-500 to-purple-600 rounded-full flex items-center justify-center">
+              <Users className="h-6 w-6 text-white" />
+            </div>
             <div>
               <h1 className="text-xl font-bold text-teal-600">Meraki Gavel Club</h1>
               <p className="text-sm text-purple-600">Inspiring Tomorrow's Leaders</p>
