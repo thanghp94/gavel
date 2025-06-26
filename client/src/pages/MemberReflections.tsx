@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +61,7 @@ const MemberReflections = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <MemberNavigation />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex justify-between items-center">
@@ -111,62 +110,43 @@ const MemberReflections = () => {
         {/* Reflections List */}
         <div className="space-y-4">
           {reflections.map((reflection) => (
-            <Card key={reflection.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-xl">{reflection.meetingTitle}</CardTitle>
-                    <CardDescription className="text-base mt-2 flex items-center gap-4">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {reflection.date}
-                      </span>
-                      <Badge variant="outline">{reflection.role}</Badge>
-                    </CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {reflection.rating && (
-                      <span className="text-yellow-500 text-sm">
-                        {getRatingStars(reflection.rating)}
-                      </span>
-                    )}
-                    <Badge className={getStatusColor(reflection.status)}>
-                      {reflection.status}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {reflection.status === 'completed' ? (
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Key Learnings:</h4>
-                      <p className="text-gray-600 text-sm">{reflection.keyLearnings}</p>
+              <Card key={reflection.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <MessageSquare className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">{reflection.meetingTitle}</p>
+                        <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                          <Calendar className="h-3 w-3" />
+                          {reflection.date}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Full Reflection
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={reflection.status === 'completed' ? 'default' : 'secondary'}
+                        className={reflection.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
+                      >
+                        {reflection.status}
+                      </Badge>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                        {reflection.status === 'pending' && (
+                          <Button size="sm">
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <MessageSquare className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600 mb-4">Reflection not completed yet</p>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Complete Reflection
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
         </div>
       </main>
     </div>

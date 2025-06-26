@@ -168,19 +168,21 @@ const MemberProgress = () => {
             </h2>
             <div className="space-y-4">
               {achievements.map((achievement) => (
-                <Card key={achievement.id}>
+                <Card key={achievement.id} className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="h-4 w-4 text-yellow-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{achievement.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{achievement.description}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline">{achievement.category}</Badge>
-                          <span className="text-xs text-gray-500">{achievement.date}</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                          <CheckCircle className="h-4 w-4 text-yellow-600" />
                         </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{achievement.title}</h3>
+                          <p className="text-sm text-gray-600">{achievement.description}</p>
+                          <Badge variant="outline" className="mt-1">{achievement.category}</Badge>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm text-gray-500">{achievement.date}</span>
                       </div>
                     </div>
                   </CardContent>

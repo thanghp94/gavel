@@ -242,32 +242,36 @@ const MemberLearning = () => {
           <TabsContent value="achievements" className="space-y-6">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {achievements.map((achievement) => (
-                <Card key={achievement.id} className={`hover:shadow-md transition-shadow ${
+                <Card key={achievement.id} className={`hover:shadow-md transition-shadow cursor-pointer ${
                   achievement.earned ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200' : 'bg-gray-50'
                 }`}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start gap-3">
-                      <Award className={`h-8 w-8 ${
-                        achievement.earned ? 'text-yellow-600' : 'text-gray-400'
-                      }`} />
-                      <div>
-                        <CardTitle className="text-lg">{achievement.title}</CardTitle>
-                        <CardDescription className="text-sm mt-1">
-                          {achievement.description}
-                        </CardDescription>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          achievement.earned ? 'bg-yellow-100' : 'bg-gray-200'
+                        }`}>
+                          <Award className={`h-4 w-4 ${
+                            achievement.earned ? 'text-yellow-600' : 'text-gray-400'
+                          }`} />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">{achievement.title}</p>
+                          <p className="text-sm text-gray-600">{achievement.description}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {achievement.earned ? (
+                          <div className="text-sm text-green-700 font-medium">
+                            {achievement.date}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-500">
+                            Locked
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {achievement.earned ? (
-                      <div className="text-sm text-green-700 font-medium">
-                        Earned on {achievement.date}
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-500">
-                        Not yet earned
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               ))}
