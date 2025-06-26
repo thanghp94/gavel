@@ -80,24 +80,24 @@ const MemberReflections = () => {
         {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">
                 {reflections.filter(r => r.status === 'completed').length}
               </div>
               <div className="text-sm text-gray-600">Completed Reflections</div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-yellow-600">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-yellow-600 mb-2">
                 {reflections.filter(r => r.status === 'pending').length}
               </div>
               <div className="text-sm text-gray-600">Pending Reflections</div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">
                 {(reflections
                   .filter(r => r.rating)
                   .reduce((sum, r) => sum + (r.rating || 0), 0) / 
