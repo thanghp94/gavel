@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,21 +11,24 @@ const MemberDashboard = () => {
   const [memberData, setMemberData] = useState(null);
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reflections, setReflections] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [user, meetings] = await Promise.all([
+        const [user, meetings, reflectionsData] = await Promise.all([
           api.getCurrentUser(),
-          api.getMeetings()
+          api.getMeetings(),
+          api.getReflections()
         ]);
-        
+
         setMemberData(user);
         // Filter upcoming meetings and limit to 2
         const upcoming = meetings
           .filter(m => m.status === 'upcoming')
           .slice(0, 2);
         setUpcomingMeetings(upcoming);
+        setReflections(reflectionsData);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
@@ -51,7 +53,7 @@ const MemberDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <MemberNavigation />
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
@@ -77,7 +79,7 @@ const MemberDashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Roles Played</CardTitle>
@@ -90,7 +92,7 @@ const MemberDashboard = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
@@ -162,7 +164,7 @@ const MemberDashboard = () => {
                 </div>
                 <Progress value={75} className="h-2" />
               </div>
-              
+
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Leadership Experience</span>
@@ -170,7 +172,7 @@ const MemberDashboard = () => {
                 </div>
                 <Progress value={60} className="h-2" />
               </div>
-              
+
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Evaluation Skills</span>
@@ -204,7 +206,7 @@ const MemberDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentReflections.map((reflection) => (
+              {reflections?.slice(0, 3).map((reflection) => (
                 <div key={reflection.id} className="p-4 border rounded-lg flex justify-between items-center">
                   <div>
                     <h4 className="font-medium text-gray-900">{reflection.meetingTitle}</h4>
