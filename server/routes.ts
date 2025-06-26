@@ -145,25 +145,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/users", authenticateToken, requireExco, async (req, res) => {
     try {
-      const { email, displayName, fullName, school, gender, role = "member" } = req.body;
+      const { email, fullName, dateOfBirth, school, gender, phone, password, role = "member" } = req.body;
 
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+      // Check if user already exists and email is provided
+      if (email) {
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser) {
+          return res.status(400).json({ message: "User already exists" });
+        }
       }
 
-      // Generate a temporary password for new users
-      const tempPassword = Math.random().toString(36).slice(-8);
+      // Use provided password or generate a temporary one
+      const tempPassword = password || Math.random().toString(36).slice(-8);
       const passwordHash = await bcrypt.hash(tempPassword, 10);
 
+      // Use fullName as displayName if not provided
+      const displayName = fullName || "Member";
+
       const userData = insertUserSchema.parse({
-        email,
+        email: email || `user${Date.now()}@temp.local`, // Generate temp email if not provided
         passwordHash,
         displayName,
         fullName: fullName || displayName,
+        dateOfBirth: dateOfBirth || null,
         school: school || null,
         gender: gender || null,
+        phone: phone || null,
         role
       });
 
@@ -177,10 +184,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fullName: user.fullName,
           role: user.role 
         },
-        tempPassword 
+        tempPassword: password ? undefined : tempPassword // Only return temp password if we generated one
       });
     } catch (error) {
-      res.status(400).json({ message: "Failed to create user" });
+      console.error('User creation error:', error);
+      res.status(400).json({ message: error.message || "Failed to create user" });
     }
   });
 
