@@ -132,7 +132,7 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-teal-500 via-teal-600 to-purple-600 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-20"></div>
@@ -436,7 +436,7 @@ const Homepage = () => {
                 </Button>
               </DialogTrigger>
             </Dialog>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
+            <Button size="lg" variant="outline" className="text-white border-white bg-white/10 hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
               Contact Us
             </Button>
           </div>
