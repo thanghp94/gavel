@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -127,7 +126,7 @@ const MemberLearning = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <MemberNavigation />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Learning Center</h1>
@@ -166,14 +165,14 @@ const MemberLearning = () => {
                         </div>
                         <Progress value={path.progress} className="h-2" />
                       </div>
-                      
+
                       {path.nextProject && (
                         <div className="bg-blue-50 p-3 rounded-lg">
                           <div className="text-sm font-medium text-blue-900">Next Project:</div>
                           <div className="text-sm text-blue-700">{path.nextProject}</div>
                         </div>
                       )}
-                      
+
                       <div className="flex gap-2">
                         <Button className="flex-1">
                           <Play className="h-4 w-4 mr-2" />
