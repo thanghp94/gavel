@@ -20,7 +20,6 @@ const Homepage = () => {
   const [newMember, setNewMember] = useState({
     email: '',
     password: '',
-    displayName: '',
     fullName: '',
     phone: '',
     userImage: '',
@@ -50,10 +49,10 @@ const Homepage = () => {
   };
 
   const handleCreateMember = async () => {
-    if (!newMember.email || !newMember.password || !newMember.displayName) {
+    if (!newMember.email || !newMember.password) {
       toast({
         title: "Error",
-        description: "Email, Password, and Display Name are required",
+        description: "Email and Password are required",
         variant: "destructive",
       });
       return;
@@ -64,7 +63,6 @@ const Homepage = () => {
       await api.createUser({
         email: newMember.email,
         password: newMember.password,
-        displayName: newMember.displayName,
         fullName: newMember.fullName,
         phone: newMember.phone,
         userImage: newMember.userImage,
@@ -81,7 +79,6 @@ const Homepage = () => {
       setNewMember({
         email: '',
         password: '',
-        displayName: '',
         fullName: '',
         phone: '',
         userImage: '',
@@ -183,15 +180,7 @@ const Homepage = () => {
                           placeholder="Enter your password"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="displayName">Display Name*</Label>
-                        <Input
-                          id="displayName"
-                          value={newMember.displayName}
-                          onChange={(e) => setNewMember({ ...newMember, displayName: e.target.value })}
-                          placeholder="John Doe"
-                        />
-                      </div>
+                      
                       <div className="space-y-2">
                         <Label htmlFor="fullName">Full Name</Label>
                         <Input
