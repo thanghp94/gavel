@@ -100,7 +100,7 @@ const ExcoUsers = () => {
   };
 
   const createUser = async () => {
-    if (!newUser.email || !newUser.fullName || !newUser.password) {
+    if (!newUser.fullName || !newUser.password) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -247,7 +247,7 @@ const ExcoUsers = () => {
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="email">Email (Optional)</Label>
                           <Input
                             id="email"
                             type="email"
