@@ -17,6 +17,7 @@ const Homepage = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [newMember, setNewMember] = useState({
     email: '',
+    password: '',
     displayName: '',
     fullName: '',
     phone: '',
@@ -25,10 +26,10 @@ const Homepage = () => {
   });
 
   const handleCreateMember = async () => {
-    if (!newMember.email || !newMember.displayName) {
+    if (!newMember.email || !newMember.password || !newMember.displayName) {
       toast({
         title: "Error",
-        description: "Email and Display Name are required",
+        description: "Email, Password, and Display Name are required",
         variant: "destructive",
       });
       return;
@@ -38,6 +39,7 @@ const Homepage = () => {
     try {
       await api.createUser({
         email: newMember.email,
+        password: newMember.password,
         displayName: newMember.displayName,
         fullName: newMember.fullName,
         phone: newMember.phone,
@@ -53,6 +55,7 @@ const Homepage = () => {
       setIsJoinDialogOpen(false);
       setNewMember({
         email: '',
+        password: '',
         displayName: '',
         fullName: '',
         phone: '',
@@ -142,6 +145,16 @@ const Homepage = () => {
                           value={newMember.email}
                           onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
                           placeholder="your.email@example.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password*</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          value={newMember.password}
+                          onChange={(e) => setNewMember({ ...newMember, password: e.target.value })}
+                          placeholder="Enter your password"
                         />
                       </div>
                       <div className="space-y-2">
