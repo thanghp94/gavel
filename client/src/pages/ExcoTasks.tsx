@@ -419,8 +419,8 @@ const ExcoTasks = () => {
                       draggable
                       onDragStart={() => handleDragStart(task)}
                     >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
+                      <CardContent className="p-3">
+                        <div className="flex items-start justify-between mb-2">
                           <h4 className="font-medium text-gray-900 text-sm leading-tight">
                             {task.title}
                           </h4>
@@ -429,11 +429,11 @@ const ExcoTasks = () => {
                           </Button>
                         </div>
                         
-                        <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">
                           {task.description}
                         </p>
                         
-                        <div className="flex flex-wrap gap-1 mb-3">
+                        <div className="flex flex-wrap gap-1 mb-2">
                           {task.labels.map((label) => (
                             <Badge 
                               key={label} 
