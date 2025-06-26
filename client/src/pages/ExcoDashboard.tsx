@@ -240,9 +240,6 @@ const ExcoDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             ExCo Dashboard
           </h1>
-          <p className="text-gray-600">
-            Manage your Gavel Club operations and track member progress.
-          </p>
         </div>
 
         {/* Stats Overview */}
