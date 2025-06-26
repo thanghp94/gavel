@@ -360,7 +360,7 @@ const ExcoTasks = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex items-center gap-3">
                   <p className="text-sm text-gray-600">Total Tasks</p>
                   <p className="text-2xl font-bold text-gray-900">{tasks.length}</p>
                 </div>
