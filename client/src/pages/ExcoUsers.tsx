@@ -355,7 +355,6 @@ const ExcoUsers = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Display Name</TableHead>
                       <TableHead>Full Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>School</TableHead>
@@ -369,8 +368,7 @@ const ExcoUsers = () => {
                   <TableBody>
                     {filteredUsers.map((user) => (
                       <TableRow key={user.id} className="h-12">
-                        <TableCell className="font-medium py-2 px-3 max-w-32 truncate">{user.displayName}</TableCell>
-                        <TableCell className="py-2 px-3 max-w-32 truncate">{user.fullName}</TableCell>
+                        <TableCell className="font-medium py-2 px-3 max-w-32 truncate">{user.fullName}</TableCell>
                         <TableCell className="py-2 px-3 max-w-48 truncate text-sm">{user.email}</TableCell>
                         <TableCell className="py-2 px-3 max-w-32 truncate">{user.school || '-'}</TableCell>
                         <TableCell className="py-2 px-3 max-w-20 truncate">{user.gender || '-'}</TableCell>
