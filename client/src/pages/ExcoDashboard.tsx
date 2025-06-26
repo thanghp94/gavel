@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Users, 
   Calendar, 
@@ -13,11 +17,13 @@ import {
   Clock,
   BookOpen,
   Globe,
-  Eye
+  Eye,
+  Plus
 } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
 import { MeetingDetailsDialog } from "@/components/MeetingDetailsDialog";
 import { api } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const ExcoDashboard = () => {
   const [dashboardStats] = useState({
@@ -32,6 +38,17 @@ const ExcoDashboard = () => {
   const [selectedMeetingId, setSelectedMeetingId] = useState(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const [newMeeting, setNewMeeting] = useState({
+    title: "",
+    date: "",
+    time: "",
+    location: "",
+    theme: "",
+    description: ""
+  });
 
   useEffect(() => {
     const fetchMeetings = async () => {
@@ -57,6 +74,36 @@ const ExcoDashboard = () => {
     setSelectedMeeting(meeting);
     setSelectedMeetingId(meeting.id);
     setIsDetailsDialogOpen(true);
+  };
+
+  const handleAddMeeting = async () => {
+    try {
+      const meeting = await api.createMeeting(newMeeting);
+      // Add to the beginning of meetings array and limit to 5
+      const updatedMeetings = [meeting, ...meetings]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
+      setMeetings(updatedMeetings);
+      setNewMeeting({
+        title: "",
+        date: "",
+        time: "",
+        location: "",
+        theme: "",
+        description: ""
+      });
+      setIsAddDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Meeting created successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create meeting",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status) => {
@@ -206,13 +253,106 @@ const ExcoDashboard = () => {
           {/* Recent Meetings */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-blue-600" />
-                Recent Meetings
-              </CardTitle>
-              <CardDescription>
-                Click on any meeting to view details
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Recent Meetings
+                  </CardTitle>
+                  <CardDescription>
+                    Click on any meeting to view details
+                  </CardDescription>
+                </div>
+                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Meeting
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Create New Meeting</DialogTitle>
+                      <DialogDescription>
+                        Add a new meeting to the schedule
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="title">Meeting Title</Label>
+                          <Input
+                            id="title"
+                            value={newMeeting.title}
+                            onChange={(e) => setNewMeeting({...newMeeting, title: e.target.value})}
+                            placeholder="Weekly Meeting #25"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="theme">Theme</Label>
+                          <Input
+                            id="theme"
+                            value={newMeeting.theme}
+                            onChange={(e) => setNewMeeting({...newMeeting, theme: e.target.value})}
+                            placeholder="Leadership Excellence"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="date">Date</Label>
+                          <Input
+                            id="date"
+                            type="date"
+                            value={newMeeting.date}
+                            onChange={(e) => setNewMeeting({...newMeeting, date: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="time">Time</Label>
+                          <Input
+                            id="time"
+                            type="time"
+                            value={newMeeting.time}
+                            onChange={(e) => setNewMeeting({...newMeeting, time: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="location">Location</Label>
+                          <Input
+                            id="location"
+                            value={newMeeting.location}
+                            onChange={(e) => setNewMeeting({...newMeeting, location: e.target.value})}
+                            placeholder="Conference Room A"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                          id="description"
+                          value={newMeeting.description}
+                          onChange={(e) => setNewMeeting({...newMeeting, description: e.target.value})}
+                          placeholder="Meeting description and agenda notes..."
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                      <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddMeeting}>
+                        Create Meeting
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent className="space-y-3">
               {loading ? (
