@@ -32,8 +32,17 @@ const Navigation = () => {
                 <span>info@merakigavel.club</span>
               </div>
             </div>
-            <div className="text-teal-600 font-medium">
-              Premier Gavel Club in Da Nang, Vietnam - Since 2019
+            <div className="flex items-center space-x-4">
+              <Link to="/login">
+                <Button variant="outline" size="sm" className="text-teal-600 border-teal-600 hover:bg-teal-50">
+                  Member Login
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="outline" size="sm" className="text-purple-600 border-purple-600 hover:bg-purple-50">
+                  Exco Login
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
