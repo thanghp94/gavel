@@ -1,20 +1,22 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/lib/api';
-import { Users, Award, Calendar, Target, ArrowRight, Star } from 'lucide-react';
-import { useState } from 'react';
+import { Users, Award, Calendar, Target, ArrowRight, Star, Clock, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const Homepage = () => {
   const { toast } = useToast();
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [newMember, setNewMember] = useState({
     email: '',
     password: '',
@@ -24,6 +26,27 @@ const Homepage = () => {
     memberType: 'member',
     role: 'member'
   });
+
+  useEffect(() => {
+    fetchUpcomingMeetings();
+  }, []);
+
+  const fetchUpcomingMeetings = async () => {
+    try {
+      const response = await fetch('/api/meetings');
+      if (response.ok) {
+        const meetings = await response.json();
+        // Filter for upcoming meetings and take the next 2
+        const upcoming = meetings
+          .filter(meeting => new Date(meeting.meetingDate) > new Date())
+          .sort((a, b) => new Date(a.meetingDate) - new Date(b.meetingDate))
+          .slice(0, 2);
+        setUpcomingMeetings(upcoming);
+      }
+    } catch (error) {
+      console.error('Error fetching meetings:', error);
+    }
+  };
 
   const handleCreateMember = async () => {
     if (!newMember.email || !newMember.password || !newMember.displayName) {
@@ -233,13 +256,67 @@ const Homepage = () => {
       {/* Stats Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
-                <div className="text-4xl lg:text-5xl font-bold text-teal-600 mb-2">{stat.number}</div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-8">
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+                  <div className="text-4xl lg:text-5xl font-bold text-teal-600 mb-2">{stat.number}</div>
+                  <div className="text-gray-600 font-medium">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Coming Meetings */}
+            <div className="animate-fade-in">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-teal-600">
+                    <Calendar className="h-5 w-5" />
+                    Upcoming Meetings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {upcomingMeetings.length > 0 ? (
+                    <div className="space-y-4">
+                      {upcomingMeetings.map((meeting, index) => (
+                        <div key={meeting.id} className="border-l-4 border-orange-400 pl-4 py-2">
+                          <h4 className="font-semibold text-gray-900">{meeting.theme || 'Regular Meeting'}</h4>
+                          <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {new Date(meeting.meetingDate).toLocaleDateString('en-US', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </div>
+                            {meeting.location && (
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" />
+                                {meeting.location}
+                              </div>
+                            )}
+                          </div>
+                          {meeting.status && (
+                            <Badge variant="outline" className="mt-2">
+                              {meeting.status}
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500">No upcoming meetings scheduled</p>
+                      <p className="text-sm text-gray-400 mt-1">Check back soon for our next meeting!</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
