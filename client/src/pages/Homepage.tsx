@@ -61,7 +61,7 @@ const Homepage = () => {
                   Join Our Club
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
+                <Button size="lg" variant="outline" className="text-white border-white bg-transparent hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
                   Learn More
                 </Button>
               </div>
