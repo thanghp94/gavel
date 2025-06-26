@@ -51,7 +51,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center py-4">
           <Link to="/" className="flex items-center space-x-3">
             <img 
-              src="/attached_assets/Meraki Logo Tròn_1750924213028.jpg" 
+              src="/meraki-logo.png" 
               alt="Meraki Education Logo" 
               className="h-12 w-12 object-contain"
             />
