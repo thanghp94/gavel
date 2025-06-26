@@ -9,9 +9,9 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <img 
-                src="/lovable-uploads/82b9e3d3-86d2-46b1-a35e-dfbd7219bcad.png" 
-                alt="Meraki Gavel Club Logo" 
-                className="h-12 w-12"
+                src="/attached_assets/Meraki Logo Tròn_1750924213028.jpg" 
+                alt="Meraki Education Logo" 
+                className="h-12 w-12 object-contain"
               />
               <div>
                 <h3 className="text-xl font-bold">Meraki Gavel Club</h3>
