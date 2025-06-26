@@ -18,7 +18,8 @@ import {
   AlertCircle, 
   CheckCircle2,
   Clock,
-  MoreVertical
+  MoreVertical,
+  X
 } from "lucide-react";
 
 interface Task {
@@ -42,6 +43,8 @@ const ExcoTasks = () => {
   const [teams, setTeams] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [newTask, setNewTask] = useState({
     title: '',
@@ -202,6 +205,34 @@ const ExcoTasks = () => {
     }
     
     setDraggedTask(null);
+  };
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskDetailOpen(true);
+  };
+
+  const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
+    try {
+      await api.updateTask(taskId, updates);
+      await fetchTasks();
+      
+      // Update selected task if it's the one being updated
+      if (selectedTask?.id === taskId) {
+        setSelectedTask(prev => prev ? { ...prev, ...updates } : null);
+      }
+      
+      toast({
+        title: "Success",
+        description: "Task updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update task",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -413,11 +444,12 @@ const ExcoTasks = () => {
                   {columnTasks.map((task) => (
                     <Card 
                       key={task.id} 
-                      className={`hover:shadow-md transition-shadow cursor-move ${
+                      className={`hover:shadow-md transition-shadow cursor-pointer ${
                         draggedTask?.id === task.id ? 'opacity-50' : ''
                       }`}
                       draggable
                       onDragStart={() => handleDragStart(task)}
+                      onClick={() => handleTaskClick(task)}
                     >
                       <CardContent className="p-3">
                         <div className="flex items-start justify-between mb-2">
@@ -483,6 +515,127 @@ const ExcoTasks = () => {
             );
           })}
         </div>
+
+        {/* Task Detail Dialog */}
+        <Dialog open={isTaskDetailOpen} onOpenChange={setIsTaskDetailOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-between">
+                <span>{selectedTask?.title}</span>
+                <Badge className={`${getPriorityColor(selectedTask?.priority || 'medium')}`}>
+                  {selectedTask?.priority}
+                </Badge>
+              </DialogTitle>
+            </DialogHeader>
+            
+            {selectedTask && (
+              <div className="space-y-6">
+                {/* Task Status */}
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select 
+                    value={selectedTask.status} 
+                    onValueChange={(value) => handleUpdateTask(selectedTask.id, { status: value as 'todo' | 'in-progress' | 'done' })}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todo">To Do</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Task Description */}
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <div className="p-3 bg-gray-50 rounded-md min-h-[80px]">
+                    <p className="text-sm text-gray-700">
+                      {selectedTask.description || 'No description provided'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Task Details */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Assignee</Label>
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm">
+                        {selectedTask.assignee?.displayName || 'Unassigned'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Team</Label>
+                    <div className="text-sm">
+                      {selectedTask.team?.name || 'No team assigned'}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Due Date</Label>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span className={`text-sm ${
+                        isOverdue(selectedTask.dueDate) ? 'text-red-600' : 'text-gray-700'
+                      }`}>
+                        {formatDate(selectedTask.dueDate)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Priority</Label>
+                    <Select 
+                      value={selectedTask.priority} 
+                      onValueChange={(value) => handleUpdateTask(selectedTask.id, { priority: value as 'low' | 'medium' | 'high' })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Labels */}
+                {selectedTask.labels.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Labels</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTask.labels.map((label) => (
+                        <Badge key={label} variant="outline" className="text-xs">
+                          {label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Created/Updated dates */}
+                <div className="grid grid-cols-2 gap-4 text-xs text-gray-500">
+                  <div>
+                    <Label className="text-xs">Created</Label>
+                    <p>{selectedTask.createdAt ? new Date(selectedTask.createdAt).toLocaleDateString() : 'N/A'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Updated</Label>
+                    <p>{selectedTask.updatedAt ? new Date(selectedTask.updatedAt).toLocaleDateString() : 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
