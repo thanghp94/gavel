@@ -1,12 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Award, Calendar, Target, ArrowRight, Star, Menu, X, Phone, Mail, MapPin, Linkedin, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Users, Award, Calendar, Target, ArrowRight, Star } from 'lucide-react';
 
 const Homepage = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const features = [
     {
       icon: Users,
@@ -37,103 +35,9 @@ const Homepage = () => {
     { number: "25+", label: "Awards Won" }
   ];
 
-  const navItems = [
-    { path: '/', label: 'Home' },
-    { path: '/about', label: 'About' },
-    { path: '/members-public', label: 'Members' },
-    { path: '/contact', label: 'Contact' },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top contact bar */}
-          <div className="border-b border-gray-100 py-2 hidden md:block">
-            <div className="flex justify-between items-center text-sm text-gray-600">
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4" />
-                  <span>+84 905 123 456</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
-                  <span>info@gavelflow.club</span>
-                </div>
-              </div>
-              <div className="text-teal-600 font-medium">
-                Premier Gavel Club Management Platform - Since 2024
-              </div>
-            </div>
-          </div>
-
-          {/* Main navigation */}
-          <div className="flex justify-between items-center py-4">
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="h-12 w-12 bg-gradient-to-br from-teal-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Award className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-teal-600">GavelFlow</h1>
-                <p className="text-sm text-purple-600">Inspiring Tomorrow's Leaders</p>
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="font-medium transition-colors duration-300 hover:text-teal-600 text-gray-700"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Link to="/login">
-                <Button className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-6">
-                  Member Login
-                </Button>
-              </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2"
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-200">
-              <div className="flex flex-col space-y-4">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="font-medium transition-colors duration-300 hover:text-teal-600 text-gray-700"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Link to="/login">
-                  <Button className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white w-fit">
-                    Member Login
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </nav>
+      <Navigation />
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-teal-500 via-teal-600 to-purple-600 text-white overflow-hidden">
@@ -142,52 +46,32 @@ const Homepage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
               <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                GavelFlow
+                Meraki Gavel Club
               </h1>
               <p className="text-xl lg:text-2xl mb-4 text-teal-100 font-medium">
                 Inspiring Tomorrow's Leaders, Today!
               </p>
               <p className="text-lg mb-8 text-teal-200 leading-relaxed">
-                Your comprehensive Toastmasters club management platform. Streamline meetings, 
-                track progress, and build leadership capabilities in a supportive digital 
-                environment designed for modern Gavel Clubs.
+                Join Da Nang's premier Gavel Club since 2019. Develop your speaking skills, 
+                build leadership capabilities, and connect with like-minded individuals in 
+                a supportive community environment.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/register">
-                  <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
-                    Join Our Club
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link to="/about">
-                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
-                    Learn More
-                  </Button>
-                </Link>
+                <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
+                  Join Our Club
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
+                  Learn More
+                </Button>
               </div>
             </div>
             <div className="relative">
-              <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20">
-                <h3 className="text-2xl font-bold mb-4">Platform Features</h3>
-                <ul className="space-y-3 text-teal-100">
-                  <li className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Meeting Management
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Member Progress Tracking
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Role Assignment System
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Award className="h-5 w-5" />
-                    Achievement Recognition
-                  </li>
-                </ul>
-              </div>
+              <img 
+                src="/lovable-uploads/3644d1c0-f3a8-4177-8b39-117f31cb8620.png" 
+                alt="Meraki Gavel Club Members"
+                className="rounded-lg shadow-2xl animate-scale-in"
+              />
             </div>
           </div>
         </div>
@@ -198,7 +82,7 @@ const Homepage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className="text-center animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                 <div className="text-4xl lg:text-5xl font-bold text-teal-600 mb-2">{stat.number}</div>
                 <div className="text-gray-600 font-medium">{stat.label}</div>
               </div>
@@ -211,7 +95,7 @@ const Homepage = () => {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose GavelFlow?</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Meraki Gavel Club?</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               We provide a comprehensive platform for personal and professional development 
               through structured learning and community support.
@@ -219,7 +103,7 @@ const Homepage = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+              <Card key={index} className="hover:shadow-lg transition-shadow duration-300 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                 <CardContent className="p-6 text-center">
                   <div className="bg-gradient-to-r from-orange-100 to-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                     <feature.icon className="h-8 w-8 text-orange-600" />
@@ -238,18 +122,18 @@ const Homepage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">About GavelFlow</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">About Meraki Gavel Club</h2>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                GavelFlow is a modern, comprehensive club management platform designed specifically 
-                for Toastmasters and Gavel Clubs. We understand the unique needs of leadership 
-                development organizations and provide tools that streamline operations while 
-                enhancing the member experience.
+                Established in 2019, Meraki Gavel Club holds the distinction of being a premier 
+                Gavel Club in Da Nang, Vietnam. We are committed to developing the next 
+                generation of leaders through comprehensive training in communication, leadership, 
+                and personal development.
               </p>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Our platform enables clubs to manage meetings efficiently, track member progress, 
-                facilitate role assignments, and celebrate achievements. With user-friendly 
-                interfaces for both members and executive committees, GavelFlow transforms 
-                traditional club management into a seamless digital experience.
+                Our club provides a supportive environment where members can practice public speaking, 
+                develop leadership skills, and build lasting professional relationships. Through 
+                structured meetings, mentorship programs, and various speaking opportunities, we 
+                help our members achieve their personal and professional goals.
               </p>
               <div className="flex items-center space-x-4">
                 <div className="flex -space-x-2">
@@ -257,7 +141,7 @@ const Homepage = () => {
                     <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <span className="text-gray-600 font-medium">Trusted by clubs worldwide</span>
+                <span className="text-gray-600 font-medium">Rated excellent by our members</span>
               </div>
             </div>
             <div className="relative">
@@ -265,9 +149,9 @@ const Homepage = () => {
                 <div className="bg-white p-6 rounded-xl shadow-lg">
                   <h3 className="text-2xl font-bold text-teal-600 mb-4">Our Mission</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    To empower Gavel Clubs with innovative technology that enhances member 
-                    engagement, streamlines club operations, and accelerates leadership 
-                    development in a digital-first world.
+                    To provide a mutually supportive and positive learning environment in which 
+                    every member has the opportunity to develop oral communication and leadership 
+                    skills, which in turn foster self-confidence and personal growth.
                   </p>
                 </div>
               </div>
@@ -279,91 +163,23 @@ const Homepage = () => {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-teal-500 to-purple-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Transform Your Club?</h2>
+          <h2 className="text-4xl font-bold text-white mb-6">Ready to Begin Your Journey?</h2>
           <p className="text-xl text-teal-100 mb-8 leading-relaxed">
-            Join GavelFlow today and experience the future of club management. 
-            Streamline your operations and focus on what matters most - developing leaders.
+            Join Meraki Gavel Club today and start developing the leadership and communication 
+            skills that will transform your personal and professional life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register">
-              <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
-                Start Free Trial
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
-                Contact Us
-              </Button>
-            </Link>
+            <Button size="lg" className="bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-8 py-3 text-lg">
+              Become a Member
+            </Button>
+            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-teal-600 px-8 py-3 text-lg">
+              Contact Us
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-r from-teal-600 to-purple-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* About Section */}
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="h-12 w-12 bg-gradient-to-br from-orange-400 to-yellow-400 rounded-lg flex items-center justify-center">
-                  <Award className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">GavelFlow</h3>
-                  <p className="text-teal-200">Modern Club Management Platform</p>
-                </div>
-              </div>
-              <p className="text-teal-100 mb-4 leading-relaxed">
-                Empowering Toastmasters and Gavel Clubs worldwide with innovative technology 
-                for enhanced member engagement and streamlined club operations.
-              </p>
-              <div className="flex space-x-4">
-                <Linkedin className="h-6 w-6 text-teal-200 hover:text-white cursor-pointer transition-colors" />
-                <Twitter className="h-6 w-6 text-teal-200 hover:text-white cursor-pointer transition-colors" />
-                <Instagram className="h-6 w-6 text-teal-200 hover:text-white cursor-pointer transition-colors" />
-                <Youtube className="h-6 w-6 text-teal-200 hover:text-white cursor-pointer transition-colors" />
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-teal-100">
-                <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-                <li><Link to="/about" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link to="/features" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link to="/support" className="hover:text-white transition-colors">Support</Link></li>
-                <li><Link to="/login" className="hover:text-white transition-colors">Login</Link></li>
-              </ul>
-            </div>
-
-            {/* Contact Info */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
-              <div className="space-y-3 text-teal-100">
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5" />
-                  <span>+1 (555) 123-4567</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5" />
-                  <span>support@gavelflow.com</span>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <MapPin className="h-5 w-5 mt-1" />
-                  <span>Global Platform<br />Serving Clubs Worldwide</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-teal-500 mt-8 pt-8 text-center text-teal-200">
-            <p>&copy; 2024 GavelFlow. All rights reserved. | Empowering clubs since 2024</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
