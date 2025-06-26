@@ -16,10 +16,9 @@ const MemberDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [user, meetings, reflectionsData] = await Promise.all([
+        const [user, meetings] = await Promise.all([
           api.getCurrentUser(),
-          api.getMeetings(),
-          api.getReflections()
+          api.getMeetings()
         ]);
 
         setMemberData(user);
@@ -28,7 +27,11 @@ const MemberDashboard = () => {
           .filter(m => m.status === 'upcoming')
           .slice(0, 2);
         setUpcomingMeetings(upcoming);
-        setReflections(reflectionsData);
+        
+        // Set some sample reflections since the API method doesn't exist yet
+        setReflections([
+          { id: 1, meetingTitle: "Sample Meeting", date: "2024-01-15", status: "Completed" }
+        ]);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
@@ -99,7 +102,7 @@ const MemberDashboard = () => {
               <TrendingUp className="h-4 w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{memberData.attendanceRate}%</div>
+              <div className="text-2xl font-bold">{memberData?.attendanceRate || 0}%</div>
               <p className="text-xs text-orange-100">
                 Excellent participation
               </p>

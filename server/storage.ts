@@ -209,6 +209,12 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getUserReflections(userId: string): Promise<Reflection[]> {
+    return await db.select().from(reflections)
+      .where(eq(reflections.userId, userId))
+      .orderBy(desc(reflections.submittedAt));
+  }
+
   // Content page methods
   async getContentPages(): Promise<ContentPage[]> {
     return await db.select().from(contentPages).orderBy(asc(contentPages.title));

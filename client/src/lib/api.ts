@@ -131,6 +131,10 @@ class ApiClient {
     return this.request<any[]>(`/reflections/meeting/${meetingId}`);
   }
 
+  async getReflections() {
+    return this.request<any[]>('/reflections');
+  }
+
   // Content methods
   async getContentPage(slug: string) {
     const response = await this.request(`/content/${slug}`);

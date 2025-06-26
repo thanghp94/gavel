@@ -305,6 +305,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/reflections", authenticateToken, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const reflections = await storage.getUserReflections(user.id);
+      res.json(reflections);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch reflections" });
+    }
+  });
+
   // Content page routes (CMS)
   app.get("/api/content/:slug", async (req, res) => {
     try {
