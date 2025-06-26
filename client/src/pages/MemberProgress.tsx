@@ -82,7 +82,6 @@ const MemberProgress = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Progress</h1>
-          <p className="text-gray-600">Track your development and achievements in the club</p>
         </div>
 
         {/* Statistics Overview */}
