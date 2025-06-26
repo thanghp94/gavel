@@ -112,7 +112,7 @@ const MemberProgress = () => {
                     <p className="text-sm text-white/90">Evaluations</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-white">{statistics.totalEvaluations}</p>
+                <p className="text-xl font-bold text-white">{statistics.totalEvaluations}</p>
               </div>
             </CardContent>
           </Card>
@@ -127,7 +127,7 @@ const MemberProgress = () => {
                     <p className="text-sm text-white/90">Attendance</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-white">{statistics.attendanceRate}%</p>
+                <p className="text-xl font-bold text-white">{statistics.attendanceRate}%</p>
               </div>
             </CardContent>
           </Card>
@@ -142,7 +142,7 @@ const MemberProgress = () => {
                     <p className="text-sm text-white/90">Roles Played</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-white">{statistics.rolesPlayed}</p>
+                <p className="text-xl font-bold text-white">{statistics.rolesPlayed}</p>
               </div>
             </CardContent>
           </Card>
@@ -157,7 +157,7 @@ const MemberProgress = () => {
                     <p className="text-sm text-white/90">Avg Rating</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-white">{statistics.averageRating}</p>
+                <p className="text-xl font-bold text-white">{statistics.averageRating}</p>
               </div>
             </CardContent>
           </Card>
