@@ -53,12 +53,10 @@ const ExcoDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch all data in parallel
-        const [meetingsData, usersData, tasksData, reflectionsData] = await Promise.all([
+        // Fetch essential data first
+        const [meetingsData, usersData] = await Promise.all([
           api.getMeetings(),
-          api.getUsers(),
-          api.getTasks(),
-          api.getReflections()
+          api.getUsers()
         ]);
 
         // Sort meetings by date and limit to 5 most recent
@@ -73,6 +71,22 @@ const ExcoDashboard = () => {
           const meetingDate = new Date(meeting.date);
           return meetingDate >= today && meeting.status === 'upcoming';
         }).length;
+
+        // Fetch optional data with individual error handling
+        let tasksData = [];
+        let reflectionsData = [];
+
+        try {
+          tasksData = await api.getTasks();
+        } catch (error) {
+          console.warn('Failed to fetch tasks:', error);
+        }
+
+        try {
+          reflectionsData = await api.getReflections();
+        } catch (error) {
+          console.warn('Failed to fetch reflections:', error);
+        }
 
         // Calculate pending tasks
         const pendingTasks = tasksData.filter(task => 

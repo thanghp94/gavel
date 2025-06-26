@@ -230,23 +230,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllReflections() {
-    const results = await db
-      .select({
-        id: reflections.id,
-        meetingId: reflections.meetingId,
-        userId: reflections.userId,
-        content: reflections.content,
-        createdAt: reflections.createdAt,
-        meetingTitle: meetings.title,
-        meetingDate: meetings.date,
-        userDisplayName: users.displayName
-      })
-      .from(reflections)
-      .innerJoin(meetings, eq(reflections.meetingId, meetings.id))
-      .innerJoin(users, eq(reflections.userId, users.id))
-      .orderBy(desc(reflections.createdAt));
+    try {
+      const results = await db
+        .select({
+          id: reflections.id,
+          meetingId: reflections.meetingId,
+          userId: reflections.userId,
+          content: reflections.content,
+          createdAt: reflections.createdAt,
+          meetingTitle: meetings.title,
+          meetingDate: meetings.date,
+          userDisplayName: users.displayName
+        })
+        .from(reflections)
+        .innerJoin(meetings, eq(reflections.meetingId, meetings.id))
+        .innerJoin(users, eq(reflections.userId, users.id))
+        .orderBy(desc(reflections.createdAt));
 
-    return results;
+      return results;
+    } catch (error) {
+      console.error('Error fetching all reflections:', error);
+      return [];
+    }
   }
 
   // Content page methods
