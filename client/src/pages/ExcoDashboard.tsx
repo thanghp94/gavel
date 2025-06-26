@@ -247,50 +247,66 @@ const ExcoDashboard = () => {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium opacity-90">Total Members</p>
-                  <p className="text-2xl font-bold">{dashboardStats.totalMembers}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Users className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Total Members</p>
+                  </div>
                 </div>
-                <Users className="h-6 w-6 opacity-80" />
+                <p className="text-2xl font-bold text-blue-600">{dashboardStats.totalMembers}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium opacity-90">Active Meetings</p>
-                  <p className="text-2xl font-bold">{dashboardStats.activeMeetings}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Active Meetings</p>
+                  </div>
                 </div>
-                <Calendar className="h-6 w-6 opacity-80" />
+                <p className="text-2xl font-bold text-green-600">{dashboardStats.activeMeetings}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium opacity-90">Pending Tasks</p>
-                  <p className="text-2xl font-bold">{dashboardStats.pendingTasks}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <AlertCircle className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Pending Tasks</p>
+                  </div>
                 </div>
-                <AlertCircle className="h-6 w-6 opacity-80" />
+                <p className="text-2xl font-bold text-orange-600">{dashboardStats.pendingTasks}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium opacity-90">Reflections</p>
-                  <p className="text-2xl font-bold">{dashboardStats.completedReflections}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Reflections</p>
+                  </div>
                 </div>
-                <FileText className="h-6 w-6 opacity-80" />
+                <p className="text-2xl font-bold text-purple-600">{dashboardStats.completedReflections}</p>
               </div>
             </CardContent>
           </Card>
