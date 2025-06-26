@@ -42,6 +42,7 @@ const ExcoTasks = () => {
   const [teams, setTeams] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -166,6 +167,41 @@ const ExcoTasks = () => {
     const today = new Date();
     const dueDate = new Date(dateString);
     return dueDate < today;
+  };
+
+  const handleDragStart = (task: Task) => {
+    setDraggedTask(task);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
+    e.preventDefault();
+    
+    if (!draggedTask || draggedTask.status === newStatus) {
+      setDraggedTask(null);
+      return;
+    }
+
+    try {
+      await api.updateTask(draggedTask.id, { status: newStatus as 'todo' | 'in-progress' | 'done' });
+      await fetchTasks();
+      
+      toast({
+        title: "Success",
+        description: `Task moved to ${newStatus.replace('-', ' ')}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update task",
+        variant: "destructive",
+      });
+    }
+    
+    setDraggedTask(null);
   };
 
   return (
@@ -352,7 +388,12 @@ const ExcoTasks = () => {
           {columns.map((column) => {
             const columnTasks = getTasksByStatus(column.id);
             return (
-              <div key={column.id} className="bg-white rounded-lg border">
+              <div 
+                key={column.id} 
+                className="bg-white rounded-lg border"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, column.id)}
+              >
                 <div className="p-4 border-b">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -370,7 +411,14 @@ const ExcoTasks = () => {
                 
                 <div className="p-4 space-y-3 min-h-[400px]">
                   {columnTasks.map((task) => (
-                    <Card key={task.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <Card 
+                      key={task.id} 
+                      className={`hover:shadow-md transition-shadow cursor-move ${
+                        draggedTask?.id === task.id ? 'opacity-50' : ''
+                      }`}
+                      draggable
+                      onDragStart={() => handleDragStart(task)}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <h4 className="font-medium text-gray-900 text-sm leading-tight">
