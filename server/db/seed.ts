@@ -147,9 +147,29 @@ async function seed() {
 
     const insertedUsers = [];
     for (const user of userData) {
-      const result = await db.insert(users).values(user).onConflictDoNothing().returning();
-      if (result.length > 0) {
-        insertedUsers.push(result[0]);
+      try {
+        // Check if user already exists
+        const existing = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
+        if (existing.length > 0) {
+          // Update existing user with correct password
+          const updated = await db.update(users)
+            .set({ passwordHash: user.passwordHash })
+            .where(eq(users.email, user.email))
+            .returning();
+          if (updated.length > 0) {
+            insertedUsers.push(updated[0]);
+            console.log(`Updated existing user: ${user.email}`);
+          }
+        } else {
+          // Create new user
+          const result = await db.insert(users).values(user).returning();
+          if (result.length > 0) {
+            insertedUsers.push(result[0]);
+            console.log(`Created new user: ${user.email}`);
+          }
+        }
+      } catch (error) {
+        console.error(`Error processing user ${user.email}:`, error);
       }
     }
 
