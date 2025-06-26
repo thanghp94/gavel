@@ -78,31 +78,54 @@ const MemberReflections = () => {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {reflections.filter(r => r.status === 'completed').length}
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <MessageSquare className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Completed Reflections</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{reflections.filter(r => r.status === 'completed').length}</p>
               </div>
-              <div className="text-sm text-gray-600">Completed Reflections</div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">
-                {reflections.filter(r => r.status === 'pending').length}
+          <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white cursor-pointer hover:from-yellow-600 hover:to-yellow-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Pending Reflections</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{reflections.filter(r => r.status === 'pending').length}</p>
               </div>
-              <div className="text-sm text-gray-600">Pending Reflections</div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">
-                {(reflections
-                  .filter(r => r.rating)
-                  .reduce((sum, r) => sum + (r.rating || 0), 0) / 
-                  reflections.filter(r => r.rating).length).toFixed(1)}
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white cursor-pointer hover:from-green-600 hover:to-green-700 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <MessageSquare className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/90">Average Rating</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {(reflections
+                    .filter(r => r.rating)
+                    .reduce((sum, r) => sum + (r.rating || 0), 0) / 
+                    reflections.filter(r => r.rating).length).toFixed(1)}
+                </p>
               </div>
-              <div className="text-sm text-gray-600">Average Rating</div>
             </CardContent>
           </Card>
         </div>
