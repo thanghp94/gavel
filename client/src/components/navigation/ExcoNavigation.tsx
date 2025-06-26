@@ -48,16 +48,14 @@ export const ExcoNavigation = () => {
           <Link
             key={item.label}
             to={item.href}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-orange-100 text-orange-700'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            } ${mobile ? 'w-full' : ''}`}
+            } ${mobile ? 'w-full block' : ''}`}
             onClick={() => mobile && setIsOpen(false)}
           >
-            <item.icon className="h-4 w-4" />
             {item.label}
-            {isActive && <Badge variant="secondary" className="ml-auto">Active</Badge>}
           </Link>
         );
       })}
