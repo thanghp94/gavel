@@ -1,7 +1,7 @@
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
-import { eq, and, asc, sql } from 'drizzle-orm';
+import { eq, and, asc, desc, sql } from 'drizzle-orm';
 import {
   users,
   meetings,
@@ -78,6 +78,8 @@ export interface IStorage {
   getReflections(meetingId: string): Promise<Reflection[]>;
   createReflection(reflection: InsertReflection): Promise<Reflection>;
   getUserReflection(userId: string, meetingId: string): Promise<Reflection | undefined>;
+  getUserReflections(userId: string): Promise<Reflection[]>;
+  getAllReflections(): Promise<any[]>;
 
   // Content page methods
   getContentPages(): Promise<ContentPage[]>;
@@ -210,9 +212,41 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserReflections(userId: string): Promise<Reflection[]> {
-    return await db.select().from(reflections)
+    const results = await db
+      .select({
+        id: reflections.id,
+        meetingId: reflections.meetingId,
+        content: reflections.content,
+        createdAt: reflections.createdAt,
+        meetingTitle: meetings.title,
+        meetingDate: meetings.date
+      })
+      .from(reflections)
+      .innerJoin(meetings, eq(reflections.meetingId, meetings.id))
       .where(eq(reflections.userId, userId))
-      .orderBy(desc(reflections.submittedAt));
+      .orderBy(desc(reflections.createdAt));
+
+    return results;
+  }
+
+  async getAllReflections() {
+    const results = await db
+      .select({
+        id: reflections.id,
+        meetingId: reflections.meetingId,
+        userId: reflections.userId,
+        content: reflections.content,
+        createdAt: reflections.createdAt,
+        meetingTitle: meetings.title,
+        meetingDate: meetings.date,
+        userDisplayName: users.displayName
+      })
+      .from(reflections)
+      .innerJoin(meetings, eq(reflections.meetingId, meetings.id))
+      .innerJoin(users, eq(reflections.userId, users.id))
+      .orderBy(desc(reflections.createdAt));
+
+    return results;
   }
 
   // Content page methods
@@ -403,8 +437,8 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async deleteTeam(id: string): Promise<boolean> {
-    const result = await db.delete(teams).where(eq(teams.id, id));
+  async deleteTask(id: string): Promise<boolean> {
+    const result = await db.delete(tasks).where(eq(tasks.id, id));
     return (result.rowCount || 0) > 0;
   }
 

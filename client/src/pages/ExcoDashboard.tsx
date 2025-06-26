@@ -26,11 +26,11 @@ import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 const ExcoDashboard = () => {
-  const [dashboardStats] = useState({
-    totalMembers: 45,
-    activeMeetings: 3,
-    pendingTasks: 7,
-    completedReflections: 12
+  const [dashboardStats, setDashboardStats] = useState({
+    totalMembers: 0,
+    activeMeetings: 0,
+    pendingTasks: 0,
+    completedReflections: 0
   });
 
   const [meetings, setMeetings] = useState([]);
@@ -51,22 +51,55 @@ const ExcoDashboard = () => {
   });
 
   useEffect(() => {
-    const fetchMeetings = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const meetingsData = await api.getMeetings();
-        // Sort by date and limit to 5 most recent
+        // Fetch all data in parallel
+        const [meetingsData, usersData, tasksData, reflectionsData] = await Promise.all([
+          api.getMeetings(),
+          api.getUsers(),
+          api.getTasks(),
+          api.getReflections()
+        ]);
+
+        // Sort meetings by date and limit to 5 most recent
         const sortedMeetings = meetingsData
           .sort((a, b) => new Date(b.date) - new Date(a.date))
           .slice(0, 5);
         setMeetings(sortedMeetings);
+
+        // Calculate active meetings (upcoming meetings)
+        const today = new Date();
+        const activeMeetings = meetingsData.filter(meeting => {
+          const meetingDate = new Date(meeting.date);
+          return meetingDate >= today && meeting.status === 'upcoming';
+        }).length;
+
+        // Calculate pending tasks
+        const pendingTasks = tasksData.filter(task => 
+          task.status === 'pending' || task.status === 'in_progress'
+        ).length;
+
+        // Update dashboard stats
+        setDashboardStats({
+          totalMembers: usersData.length,
+          activeMeetings: activeMeetings,
+          pendingTasks: pendingTasks,
+          completedReflections: reflectionsData.length
+        });
+
       } catch (error) {
-        console.error('Failed to fetch meetings:', error);
+        console.error('Failed to fetch dashboard data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load dashboard data",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMeetings();
+    fetchDashboardData();
   }, []);
 
   const handleViewMeeting = (meeting: any) => {
