@@ -161,7 +161,6 @@ const ExcoUsers = () => {
             <Users className="h-8 w-8 text-orange-600" />
             <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
           </div>
-          <p className="text-gray-600">Manage all users in the Gavel Club system</p>
         </div>
 
         <div className="grid gap-6">
