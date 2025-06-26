@@ -247,66 +247,66 @@ const ExcoDashboard = () => {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 transition-colors">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Users className="h-4 w-4 text-blue-600" />
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Users className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Total Members</p>
+                    <p className="text-sm text-white/90">Total Members</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-blue-600">{dashboardStats.totalMembers}</p>
+                <p className="text-2xl font-bold text-white">{dashboardStats.totalMembers}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white cursor-pointer hover:from-green-600 hover:to-green-700 transition-colors">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Calendar className="h-4 w-4 text-green-600" />
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Active Meetings</p>
+                    <p className="text-sm text-white/90">Active Meetings</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-green-600">{dashboardStats.activeMeetings}</p>
+                <p className="text-2xl font-bold text-white">{dashboardStats.activeMeetings}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white cursor-pointer hover:from-orange-600 hover:to-orange-700 transition-colors">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <AlertCircle className="h-4 w-4 text-orange-600" />
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <AlertCircle className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Pending Tasks</p>
+                    <p className="text-sm text-white/90">Pending Tasks</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-orange-600">{dashboardStats.pendingTasks}</p>
+                <p className="text-2xl font-bold text-white">{dashboardStats.pendingTasks}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-colors">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <FileText className="h-4 w-4 text-purple-600" />
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Reflections</p>
+                    <p className="text-sm text-white/90">Reflections</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-purple-600">{dashboardStats.completedReflections}</p>
+                <p className="text-2xl font-bold text-white">{dashboardStats.completedReflections}</p>
               </div>
             </CardContent>
           </Card>
