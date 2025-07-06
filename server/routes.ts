@@ -433,11 +433,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/meetings/:meetingId/register", authenticateToken, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const { meetingId } = req.params;
+      const { roleId, speechTitle, speechObjectives } = req.body;
+
+      // Check if user is registered
+      const existing = await storage.getUserMeetingRegistration(user.id, meetingId);
+      if (!existing) {
+        return res.status(404).json({ message: "Registration not found" });
+      }
+
+      const registration = await storage.updateMeetingRegistration(existing.id, roleId, speechTitle, speechObjectives);
+      res.json(registration);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update meeting registration" });
+    }
+  });
+
   app.get("/api/meetings/:meetingId/registrations", authenticateToken, requireExco, async (req, res) => {
     try {
+      console.log('Fetching registrations for meeting:', req.params.meetingId);
       const registrations = await storage.getMeetingRegistrations(req.params.meetingId);
+      console.log('Successfully fetched registrations:', registrations.length);
       res.json(registrations);
     } catch (error) {
+      console.error('Error in registrations endpoint:', error);
       res.status(500).json({ message: "Failed to fetch registrations" });
     }
   });
@@ -481,45 +503,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add attendee to meeting
-  app.post('/api/meetings/:meetingId/add-attendee', authenticateToken, requireExco, async (req, res) => {
-    try {
-      const { meetingId } = req.params;
-      const { userId, roleId } = req.body;
-
-      const registration = await storage.registerForMeeting(userId, meetingId, roleId);
-      res.json(registration);
-    } catch (error) {
-      console.error('Error adding attendee:', error);
-      res.status(400).json({ error: 'Failed to add attendee' });
-    }
-  });
-
-  // Get meeting registrations
-  app.get('/api/meetings/:meetingId/registrations', authenticateToken, requireExco, async (req, res) => {
-    try {
-      const { meetingId } = req.params;
-      const registrations = await storage.getMeetingRegistrations(meetingId);
-      res.json(registrations);
-    } catch (error) {
-      console.error('Error fetching registrations:', error);
-      res.status(500).json({ error: 'Failed to fetch registrations' });
-    }
-  });
-
-  // Update participant role
-  app.put('/api/registrations/:registrationId/role', authenticateToken, requireExco, async (req, res) => {
-    try {
-      const { registrationId } = req.params;
-      const { roleId } = req.body;
-
-      const result = await storage.updateRegistrationRole(registrationId, roleId);
-      res.json(result);
-    } catch (error) {
-      console.error('Error updating role:', error);
-      res.status(400).json({ error: 'Failed to update role' });
-    }
-  });
 
   // Meeting report routes
   app.post("/api/meetings/:meetingId/reports", authenticateToken, async (req, res) => {
@@ -528,11 +511,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reportData = req.body;
       const user = (req as any).user;
 
-      // Validate the report data
-      const validatedData = insertMeetingReportSchema.parse({
+      // Convert empty strings to null for time fields
+      const processedData = {
         ...reportData,
+        timeUsed: reportData.timeUsed === "" || reportData.timeUsed === undefined ? null : reportData.timeUsed,
         createdBy: user.id,
-      });
+      };
+
+      console.log('Processed meeting report data:', JSON.stringify(processedData, null, 2));
+
+      // Validate the report data
+      const validatedData = insertMeetingReportSchema.parse(processedData);
 
       const report = await storage.createMeetingReport(validatedData);
       res.json(report);
@@ -553,10 +542,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/participants/:participationId/reports", authenticateToken, async (req, res) => {
+  app.get("/api/participants/:meetingRegistrationId/reports", authenticateToken, async (req, res) => {
     try {
-      const { participationId } = req.params;
-      const reports = await storage.getParticipantReports(participationId);
+      const { meetingRegistrationId } = req.params;
+      const reports = await storage.getParticipantReports(meetingRegistrationId);
       res.json(reports);
     } catch (error) {
       console.error('Error fetching participant reports:', error);
@@ -612,79 +601,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Team routes
-  app.get("/api/teams", authenticateToken, async (req, res) => {
+  app.post("/api/tasks", authenticateToken, requireExco, async (req, res) => {
     try {
-      const teams = await storage.getTeams();
-      res.json(teams);
-    } catch (error) {
-      console.error('Error fetching teams:', error);
-      res.status(500).json({ message: "Failed to fetch teams" });
-    }
-  });
-
-  app.post("/api/teams", authenticateToken, async (req, res) => {
-    try {
+      console.log('=== Task Creation Debug ===');
       const user = (req as any).user;
-      const teamData = insertTeamSchema.parse({
+      console.log('Authenticated user:', { id: user?.id, email: user?.email, role: user?.role });
+      console.log('Request body:', JSON.stringify(req.body, null, 2));
+      
+      const taskDataWithUser = {
         ...req.body,
-        leaderId: user.id,
-      });
-      const team = await storage.createTeam(teamData);
-      res.json(team);
-    } catch (error) {
-      console.error('Error creating team:', error);
-      res.status(400).json({ message: "Failed to create team" });
-    }
-  });
-
-  app.get("/api/teams/:teamId/members", authenticateToken, async (req, res) => {
-    try {
-      const members = await storage.getTeamMembers(req.params.teamId);
-      res.json(members);
-    } catch (error) {
-      console.error('Error fetching team members:', error);
-      res.status(500).json({ message: "Failed to fetch team members" });
-    }
-  });
-
-  // Task routes
-  app.get("/api/tasks", authenticateToken, async (req, res) => {
-    try {
-      const teamId = req.query.teamId as string;
-      const tasks = await storage.getTasks(teamId);
-      res.json(tasks);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-      res.status(500).json({ message: "Failed to fetch tasks" });
-    }
-  });
-
-  app.post("/api/tasks", authenticateToken, async (req, res) => {
-    try {
-      const user = (req as any).user;
-      const taskData = insertTaskSchema.parse({
-        ...req.body,
-        createdBy: user.id,
-      });
+        createdBy: user.id
+      };
+      console.log('Task data with createdBy:', JSON.stringify(taskDataWithUser, null, 2));
+      
+      const taskData = insertTaskSchema.parse(taskDataWithUser);
+      console.log('Parsed task data:', JSON.stringify(taskData, null, 2));
+      
       const task = await storage.createTask(taskData);
+      console.log('Created task:', JSON.stringify(task, null, 2));
+      
       res.json(task);
     } catch (error) {
-      console.error('Error creating task:', error);
-      res.status(400).json({ message: "Failed to create task" });
+      console.error('=== Task Creation Error ===');
+      console.error('Error type:', error.constructor.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      if (error.issues) {
+        console.error('Validation issues:', JSON.stringify(error.issues, null, 2));
+      }
+      res.status(400).json({ 
+        message: "Failed to create task",
+        error: error.message,
+        details: error.issues || null
+      });
     }
   });
 
-  app.put("/api/tasks/:taskId", authenticateToken, async (req, res) => {
+  app.put("/api/tasks/:id", authenticateToken, requireExco, async (req, res) => {
     try {
+      const taskId = req.params.id;
       const updates = req.body;
-      const task = await storage.updateTask(req.params.taskId, updates);
+      const task = await storage.updateTask(taskId, updates);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
       res.json(task);
     } catch (error) {
       console.error('Error updating task:', error);
       res.status(400).json({ message: "Failed to update task" });
     }
   });
+
+  app.delete("/api/tasks/:id", authenticateToken, requireExco, async (req, res) => {
+    try {
+      const taskId = req.params.id;
+      const success = await storage.deleteTask(taskId);
+      if (!success) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      res.json({ message: "Task deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      res.status(400).json({ message: "Failed to delete task" });
+    }
+  });
+
 
   const httpServer = createServer(app);
   return httpServer;

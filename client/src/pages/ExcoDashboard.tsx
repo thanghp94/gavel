@@ -33,7 +33,7 @@ const ExcoDashboard = () => {
     completedReflections: 0
   });
 
-  const [meetings, setMeetings] = useState([]);
+  const [meetings, setMeetings] = useState<any[]>([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [selectedMeetingId, setSelectedMeetingId] = useState(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -125,7 +125,27 @@ const ExcoDashboard = () => {
 
   const handleAddMeeting = async () => {
     try {
-      const meeting = await api.createMeeting(newMeeting);
+      // Validate required fields
+      if (!newMeeting.title || !newMeeting.date || !newMeeting.time) {
+        toast({
+          title: "Error",
+          description: "Please fill in all required fields (Title, Date, Time)",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Only send fields that exist in the meetings table schema
+      const meetingData = {
+        title: newMeeting.title,
+        date: newMeeting.date,
+        time: newMeeting.time,
+        theme: newMeeting.theme || null,
+        location: newMeeting.location || null,
+        status: "upcoming"
+      };
+
+      const meeting = await api.createMeeting(meetingData);
       // Add to the beginning of meetings array and limit to 5
       const updatedMeetings = [meeting, ...meetings]
         .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -145,15 +165,16 @@ const ExcoDashboard = () => {
         description: "Meeting created successfully",
       });
     } catch (error) {
+      console.error('Meeting creation error:', error);
       toast({
         title: "Error",
-        description: "Failed to create meeting",
+        description: error instanceof Error ? error.message : "Failed to create meeting",
         variant: "destructive",
       });
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: any) => {
     switch (status) {
       case 'upcoming': return 'bg-blue-100 text-blue-700';
       case 'completed': return 'bg-green-100 text-green-700';
@@ -430,7 +451,7 @@ const ExcoDashboard = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h4 className="font-medium text-gray-900 text-sm truncate">{meeting.title}</h4>
-                          <Badge className={getStatusColor(meeting.status)} variant="secondary" size="sm">
+                          <Badge className={getStatusColor(meeting.status)} variant="secondary">
                             {meeting.status}
                           </Badge>
                         </div>

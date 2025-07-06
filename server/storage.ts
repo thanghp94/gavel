@@ -7,7 +7,6 @@ import {
   meetings,
   roles,
   roleContent,
-  meetingRoles,
   meetingRegistration,
   reflections,
   contentPages,
@@ -97,7 +96,7 @@ export interface IStorage {
   // Meeting report methods
   createMeetingReport(report: InsertMeetingReport): Promise<MeetingReport>;
   getMeetingReports(meetingId: string): Promise<any[]>;
-  getParticipantReports(participationId: string): Promise<MeetingReport[]>;
+  getParticipantReports(meetingRegistrationId: string): Promise<MeetingReport[]>;
 
   // Team methods
   getTeams(): Promise<Team[]>;
@@ -321,22 +320,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMeetingRegistrations(meetingId: string) {
-    return await db.select({
-      id: meetingRegistration.id,
-      userId: meetingRegistration.userId,
-      roleId: meetingRegistration.roleId,
-      dateRegistered: meetingRegistration.dateRegister,
-      attendanceStatus: meetingRegistration.attendanceStatus,
-      speechTitle: meetingRegistration.speechTitle,
-      speechObjectives: meetingRegistration.speechObjectives,
-      userDisplayName: users.displayName,
-      userFullName: users.fullName,
-      roleName: roles.name
-    })
-    .from(meetingRegistration)
-    .leftJoin(users, eq(meetingRegistration.userId, users.id))
-    .leftJoin(roles, eq(meetingRegistration.roleId, roles.id))
-    .where(eq(meetingRegistration.meetingId, meetingId));
+    try {
+      console.log('Fetching registrations for meeting:', meetingId);
+      const result = await db.select({
+        id: meetingRegistration.id,
+        userId: meetingRegistration.userId,
+        roleId: meetingRegistration.roleId,
+        dateRegistered: meetingRegistration.dateRegister,
+        attendanceStatus: meetingRegistration.attendanceStatus,
+        speechTitle: meetingRegistration.speechTitle,
+        speechObjectives: meetingRegistration.speechObjectives,
+        userDisplayName: users.displayName,
+        userFullName: users.fullName,
+        roleName: roles.name
+      })
+      .from(meetingRegistration)
+      .leftJoin(users, eq(meetingRegistration.userId, users.id))
+      .leftJoin(roles, eq(meetingRegistration.roleId, roles.id))
+      .where(eq(meetingRegistration.meetingId, meetingId));
+      
+      console.log('Found registrations:', result.length);
+      return result;
+    } catch (error) {
+      console.error('Error in getMeetingRegistrations:', error);
+      throw error;
+    }
   }
 
   async getUserMeetingRegistration(userId: string, meetingId: string) {
@@ -350,6 +358,18 @@ export class DatabaseStorage implements IStorage {
   async updateAttendanceStatus(registrationId: string, status: string) {
     const result = await db.update(meetingRegistration)
       .set({ attendanceStatus: status })
+      .where(eq(meetingRegistration.id, registrationId))
+      .returning();
+    return result[0];
+  }
+
+  async updateMeetingRegistration(registrationId: string, roleId?: string, speechTitle?: string, speechObjectives?: string) {
+    const result = await db.update(meetingRegistration)
+      .set({ 
+        roleId: roleId || null,
+        speechTitle: speechTitle || null,
+        speechObjectives: speechObjectives || null
+      })
       .where(eq(meetingRegistration.id, registrationId))
       .returning();
     return result[0];
@@ -372,6 +392,7 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
+
   async getMeetingReports(meetingId: string): Promise<any[]> {
     const result = await db
       .select({
@@ -384,27 +405,22 @@ export class DatabaseStorage implements IStorage {
         evaluatorRole: {
           id: roles.id,
           name: roles.name,
-        },
-        createdByUser: {
-          id: users.id,
-          displayName: users.displayName,
         }
       })
       .from(meetingReports)
-      .innerJoin(meetingRegistration, eq(meetingReports.participationId, meetingRegistration.id))
+      .innerJoin(meetingRegistration, eq(meetingReports.meetingRegistrationId, meetingRegistration.id))
       .innerJoin(users, eq(meetingRegistration.userId, users.id))
       .innerJoin(roles, eq(meetingReports.roleId, roles.id))
-      .leftJoin(users as any, eq(meetingReports.createdBy, users.id))
       .where(eq(meetingRegistration.meetingId, meetingId));
 
     return result;
   }
 
-  async getParticipantReports(participationId: string): Promise<MeetingReport[]> {
+  async getParticipantReports(meetingRegistrationId: string): Promise<MeetingReport[]> {
     const result = await db
       .select()
       .from(meetingReports)
-      .where(eq(meetingReports.participationId, participationId));
+      .where(eq(meetingReports.meetingRegistrationId, meetingRegistrationId));
 
     return result;
   }

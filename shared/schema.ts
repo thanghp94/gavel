@@ -51,15 +51,6 @@ export const roleContent = pgTable("role_content", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
-// Meeting roles table (junction table)
-export const meetingRoles = pgTable("meeting_roles", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  meetingId: uuid("meeting_id").notNull().references(() => meetings.id, { onDelete: "cascade" }),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  roleId: uuid("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
-  speechTitle: varchar("speech_title", { length: 255 }),
-  speechObjectives: text("speech_objectives"),
-});
 
 // Meeting registration table (includes meeting roles functionality)
 export const meetingRegistration = pgTable("meeting_registration", {
@@ -127,9 +118,8 @@ export const learningMaterials = pgTable("learning_materials", {
 // Meeting reports table (for speaker evaluations)
 export const meetingReports = pgTable("meeting_report", {
   id: uuid("id").primaryKey().defaultRandom(),
-  participationId: uuid("participation_id").notNull().references(() => meetingRegistration.id, { onDelete: "cascade" }),
+  meetingRegistrationId: uuid("meeting_registration_id").notNull().references(() => meetingRegistration.id, { onDelete: "cascade" }),
   roleId: uuid("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
-  evaluatorParticipationSession: text("evaluator_participation_session"),
   comment1: text("comment_1"),
   timeUsed: time("time_used"),
   comment2: text("comment_2"),
@@ -178,7 +168,9 @@ export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export const insertMeetingSchema = createInsertSchema(meetings);
 export const insertReflectionSchema = createInsertSchema(reflections);
-export const insertMeetingReportSchema = createInsertSchema(meetingReports);
+export const insertMeetingReportSchema = createInsertSchema(meetingReports).extend({
+  timeUsed: z.string().optional().nullable().transform(val => val === "" ? null : val),
+});
 export const insertTeamSchema = createInsertSchema(teams);
 export const insertTaskSchema = createInsertSchema(tasks);
 

@@ -152,14 +152,23 @@ async function seed() {
         // Check if user already exists
         const existing = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
         if (existing.length > 0) {
-          // Update existing user with correct password
+          // Update existing user with correct password and role
           const updated = await db.update(users)
-            .set({ passwordHash: user.passwordHash })
+            .set({ 
+              passwordHash: user.passwordHash,
+              role: user.role,
+              displayName: user.displayName,
+              fullName: user.fullName,
+              dateOfBirth: user.dateOfBirth,
+              school: user.school,
+              gender: user.gender,
+              phone: user.phoneNumber
+            })
             .where(eq(users.email, user.email))
             .returning();
           if (updated.length > 0) {
             insertedUsers.push(updated[0]);
-            console.log(`Updated existing user: ${user.email}`);
+            console.log(`Updated existing user: ${user.email} with role: ${user.role}`);
           }
         } else {
           // Create new user

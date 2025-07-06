@@ -19,15 +19,15 @@ interface MeetingDetailsDialogProps {
 }
 
 export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: MeetingDetailsDialogProps) => {
-  const [participants, setParticipants] = useState([]);
-  const [roles, setRoles] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [participants, setParticipants] = useState<any[]>([]);
+  const [roles, setRoles] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [editingParticipant, setEditingParticipant] = useState(null);
-  const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [editingParticipant, setEditingParticipant] = useState<any>(null);
+  const [selectedRoleId, setSelectedRoleId] = useState("no-role");
   const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [addParticipantRoleId, setAddParticipantRoleId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("none");
+  const [addParticipantRoleId, setAddParticipantRoleId] = useState("no-role");
   const [isNewUser, setIsNewUser] = useState(false);
   const [newUserData, setNewUserData] = useState({
     email: "",
@@ -43,7 +43,6 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [reportData, setReportData] = useState({
     roleId: '',
-    evaluatorParticipationSession: '',
     comment1: '',
     timeUsed: '',
     comment2: '',
@@ -97,7 +96,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     }
   };
 
-  const handleEditRole = (participant) => {
+  const handleEditRole = (participant: any) => {
     setEditingParticipant(participant);
     setSelectedRoleId(participant.roleId || "no-role");
   };
@@ -134,7 +133,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     }
   };
 
-  const handleAttendanceCheck = async (participantId, currentStatus) => {
+  const handleAttendanceCheck = async (participantId: any, currentStatus: any) => {
     const newStatus = currentStatus === 'present' ? 'absent' : 'present';
 
     try {
@@ -164,7 +163,6 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
     setSelectedParticipant(participant);
     setReportData({
       roleId: '',
-      evaluatorParticipationSession: '',
       comment1: '',
       timeUsed: '',
       comment2: '',
@@ -185,7 +183,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
 
     try {
       await api.createMeetingReport(meetingId, {
-        participationId: selectedParticipant.id,
+        meetingRegistrationId: selectedParticipant.id,
         ...reportData
       });
 
@@ -408,7 +406,7 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
                       </span>
                     </TableCell>
                     <TableCell className="py-1">
-                      <Badge className={getAttendanceColor(participant.attendanceStatus)} size="sm">
+                      <Badge className={getAttendanceColor(participant.attendanceStatus)}>
                         {participant.attendanceStatus}
                       </Badge>
                     </TableCell>
@@ -632,15 +630,6 @@ export const MeetingDetailsDialog = ({ isOpen, onClose, meetingId, meeting }: Me
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="session">Evaluator Session</Label>
-              <Input
-                id="session"
-                value={reportData.evaluatorParticipationSession}
-                onChange={(e) => setReportData({...reportData, evaluatorParticipationSession: e.target.value})}
-                placeholder="e.g., Table Topics, Prepared Speech"
-              />
-            </div>
 
             <div className="space-y-2">
               <Label htmlFor="comment1">Strengths & Positives</Label>

@@ -189,6 +189,15 @@ class ApiClient {
     return response;
   }
 
+  async updateMeetingRegistration(meetingId: string, roleId?: string, speechTitle?: string, speechObjectives?: string) {
+    const response = await this.request(`/meetings/${meetingId}/register`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roleId, speechTitle, speechObjectives }),
+    });
+    return response;
+  }
+
   async updateAttendanceStatus(registrationId: string, status: string) {
     const response = await this.request(`/registrations/${registrationId}/attendance`, {
       method: 'PUT',
@@ -242,18 +251,18 @@ class ApiClient {
 
   // Meeting report methods
   async createMeetingReport(meetingId: string, report: any) {
-    return this.request(`/api/meetings/${meetingId}/reports`, {
+    return this.request(`/meetings/${meetingId}/reports`, {
       method: "POST",
       body: JSON.stringify(report),
     });
   }
 
   async getMeetingReports(meetingId: string) {
-    return this.request(`/api/meetings/${meetingId}/reports`);
+    return this.request(`/meetings/${meetingId}/reports`);
   }
 
   async getParticipantReports(participationId: string) {
-    return this.request(`/api/participants/${participationId}/reports`);
+    return this.request(`/participants/${participationId}/reports`);
   }
 
   logout() {

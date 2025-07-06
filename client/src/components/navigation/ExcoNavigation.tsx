@@ -35,7 +35,6 @@ export const ExcoNavigation = () => {
     { icon: Users, label: "Members", href: "/exco/users" },
     { icon: Calendar, label: "Meetings", href: "/exco/meetings" },
     { icon: BookOpen, label: "Content", href: "/exco/content" },
-    { icon: Globe, label: "Public Pages", href: "/exco/cms" },
     { icon: FileText, label: "Tasks", href: "/exco/tasks" },
     { icon: TrendingUp, label: "Analytics", href: "/exco/analytics" }
   ];

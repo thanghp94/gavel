@@ -286,7 +286,7 @@ const AdminContent = () => {
                             <Button 
                               variant="ghost" 
                               size="sm"
-                              onClick={() => window.open(`/${page.slug}`, '_blank')}
+                              onClick={() => window.open(`/content/${page.slug}`, '_blank')}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>

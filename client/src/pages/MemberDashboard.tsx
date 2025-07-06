@@ -3,30 +3,111 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, BookOpen, TrendingUp, MessageSquare, User, Clock, Award } from "lucide-react";
+import { Calendar, BookOpen, TrendingUp, MessageSquare, User, Clock, Award, Edit } from "lucide-react";
 import { MemberNavigation } from "@/components/navigation/MemberNavigation";
+import { MeetingRegistrationDialog } from "@/components/MeetingRegistrationDialog";
 import { api } from "@/lib/api";
 
+interface Registration {
+  id: string;
+  roleId?: string;
+  attendanceStatus: string;
+  speechTitle?: string;
+  speechObjectives?: string;
+}
+
+interface MeetingWithRegistration {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  theme: string;
+  status: string;
+  registration: Registration | null;
+  role: string | null;
+  isRegistered: boolean;
+}
+
+interface Reflection {
+  id: number;
+  meetingTitle: string;
+  date: string;
+  status: string;
+}
+
+interface Role {
+  id: string;
+  name: string;
+}
+
+interface User {
+  id: string;
+  email: string;
+  displayName: string;
+  role: string;
+  attendanceRate?: number;
+}
+
 const MemberDashboard = () => {
-  const [memberData, setMemberData] = useState(null);
-  const [upcomingMeetings, setUpcomingMeetings] = useState([]);
+  const [memberData, setMemberData] = useState<User | null>(null);
+  const [upcomingMeetings, setUpcomingMeetings] = useState<MeetingWithRegistration[]>([]);
   const [loading, setLoading] = useState(true);
-  const [reflections, setReflections] = useState([]);
+  const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [registrationDialog, setRegistrationDialog] = useState<{
+    isOpen: boolean;
+    meeting: MeetingWithRegistration | null;
+    isEditing: boolean;
+  }>({
+    isOpen: false,
+    meeting: null,
+    isEditing: false,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [user, meetings] = await Promise.all([
+        const [user, meetings, rolesData] = await Promise.all([
           api.getCurrentUser(),
-          api.getMeetings()
+          api.getMeetings(),
+          api.getRoles()
         ]);
 
         setMemberData(user);
+        setRoles(rolesData);
+        
         // Filter upcoming meetings and limit to 2
         const upcoming = meetings
           .filter(m => m.status === 'upcoming')
           .slice(0, 2);
-        setUpcomingMeetings(upcoming);
+
+        // Fetch registration status for each upcoming meeting
+        const meetingsWithRegistration = await Promise.all(
+          upcoming.map(async (meeting) => {
+            try {
+              const registration = await api.getMyMeetingRegistration(meeting.id) as Registration;
+              const role = registration?.roleId 
+                ? rolesData.find(r => r.id === registration.roleId)
+                : null;
+              
+              return {
+                ...meeting,
+                registration,
+                role: role?.name || null,
+                isRegistered: !!registration
+              };
+            } catch (error) {
+              return {
+                ...meeting,
+                registration: null,
+                role: null,
+                isRegistered: false
+              };
+            }
+          })
+        );
+
+        setUpcomingMeetings(meetingsWithRegistration);
         
         // Set some sample reflections since the API method doesn't exist yet
         setReflections([
@@ -41,6 +122,64 @@ const MemberDashboard = () => {
 
     fetchData();
   }, []);
+
+  const refreshMeetingsData = async () => {
+    try {
+      const meetings = await api.getMeetings();
+      const upcoming = meetings
+        .filter((m: any) => m.status === 'upcoming')
+        .slice(0, 2);
+
+      const meetingsWithRegistration = await Promise.all(
+        upcoming.map(async (meeting: any) => {
+          try {
+            const registration = await api.getMyMeetingRegistration(meeting.id) as Registration;
+            const role = registration?.roleId 
+              ? roles.find(r => r.id === registration.roleId)
+              : null;
+            
+            return {
+              ...meeting,
+              registration,
+              role: role?.name || null,
+              isRegistered: !!registration
+            };
+          } catch (error) {
+            return {
+              ...meeting,
+              registration: null,
+              role: null,
+              isRegistered: false
+            };
+          }
+        })
+      );
+
+      setUpcomingMeetings(meetingsWithRegistration);
+    } catch (error) {
+      console.error('Failed to refresh meetings data:', error);
+    }
+  };
+
+  const handleOpenRegistrationDialog = (meeting: MeetingWithRegistration, isEditing: boolean = false) => {
+    setRegistrationDialog({
+      isOpen: true,
+      meeting,
+      isEditing,
+    });
+  };
+
+  const handleCloseRegistrationDialog = () => {
+    setRegistrationDialog({
+      isOpen: false,
+      meeting: null,
+      isEditing: false,
+    });
+  };
+
+  const handleRegistrationSuccess = () => {
+    refreshMeetingsData();
+  };
 
   if (loading) {
     return (
@@ -126,7 +265,11 @@ const MemberDashboard = () => {
                 <div key={meeting.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold text-gray-900">{meeting.title}</h4>
-                    <Badge variant="secondary">{meeting.role}</Badge>
+                    {meeting.isRegistered && meeting.role ? (
+                      <Badge variant="default">{meeting.role}</Badge>
+                    ) : (
+                      <Badge variant="secondary">Not Registered</Badge>
+                    )}
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                     <span className="flex items-center gap-1">
@@ -139,11 +282,48 @@ const MemberDashboard = () => {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-3">Theme: {meeting.theme}</p>
-                  <Button size="sm" variant="outline" className="w-full">
-                    View Role Guidelines
-                  </Button>
+                  
+                  {meeting.isRegistered ? (
+                    <div className="space-y-2">
+                      {meeting.role && meeting.role !== "Guest" && meeting.role !== "No Role" ? (
+                        <Button size="sm" variant="outline" className="w-full">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          View Role Guidelines
+                        </Button>
+                      ) : (
+                        <div className="text-sm text-gray-600 text-center py-2">
+                          {meeting.role === "Guest" ? "Registered as Guest" : "No specific role assigned"}
+                        </div>
+                      )}
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => handleOpenRegistrationDialog(meeting, true)}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Change Role
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => handleOpenRegistrationDialog(meeting, false)}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      Register for Meeting
+                    </Button>
+                  )}
                 </div>
               ))}
+              
+              {upcomingMeetings.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>No upcoming meetings scheduled</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -254,6 +434,21 @@ const MemberDashboard = () => {
           </Card>
         </div>
       </main>
+
+      {/* Meeting Registration Dialog */}
+      <MeetingRegistrationDialog
+        isOpen={registrationDialog.isOpen}
+        onClose={handleCloseRegistrationDialog}
+        meeting={registrationDialog.meeting}
+        roles={roles}
+        onRegistrationSuccess={handleRegistrationSuccess}
+        isEditing={registrationDialog.isEditing}
+        currentRegistration={registrationDialog.meeting?.registration ? {
+          roleId: registrationDialog.meeting.registration.roleId,
+          speechTitle: undefined, // We'll need to add these fields to the registration interface
+          speechObjectives: undefined
+        } : undefined}
+      />
     </div>
   );
 };
