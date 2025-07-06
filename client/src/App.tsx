@@ -23,6 +23,7 @@ import ExcoTasks from "./pages/ExcoTasks";
 import ExcoUsers from "./pages/ExcoUsers";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import ExcoAnnouncements from "./pages/ExcoAnnouncements";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/exco/content" element={<ProtectedRoute><AdminContent /></ProtectedRoute>} />
           <Route path="/exco/tasks" element={<ProtectedRoute><ExcoTasks /></ProtectedRoute>} />
           <Route path="/exco/users" element={<ProtectedRoute><ExcoUsers /></ProtectedRoute>} />
+          <Route path="/exco/announcements" element={<ProtectedRoute><ExcoAnnouncements /></ProtectedRoute>} />
           <Route path="/content/:slug" element={<ContentPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

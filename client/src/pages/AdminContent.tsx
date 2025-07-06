@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Video, FileText, Users, Plus, Edit, Trash2, Eye, Upload, PenTool } from "lucide-react";
 import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
-import ContentBlockEditor from "@/components/ContentBlockEditor";
+import ContentBlockEditorWithMediaSearch from "@/components/ContentBlockEditorWithMediaSearch";
 import { api } from "@/lib/api";
 
 const AdminContent = () => {
@@ -314,7 +314,7 @@ const AdminContent = () => {
                   </DialogDescription>
                 </DialogHeader>
 
-                <ContentBlockEditor
+                <ContentBlockEditorWithMediaSearch
                   initialBlocks={newPageData.blocks}
                   onSave={handleSavePage}
                   pageTitle={newPageData.title}

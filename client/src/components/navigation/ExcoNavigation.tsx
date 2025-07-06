@@ -36,7 +36,8 @@ export const ExcoNavigation = () => {
     { icon: Calendar, label: "Meetings", href: "/exco/meetings" },
     { icon: BookOpen, label: "Content", href: "/exco/content" },
     { icon: FileText, label: "Tasks", href: "/exco/tasks" },
-    { icon: TrendingUp, label: "Analytics", href: "/exco/analytics" }
+    { icon: TrendingUp, label: "Analytics", href: "/exco/analytics" },
+    { icon: Bell, label: "Announcements", href: "/exco/announcements" }
   ];
 
   const NavItems = ({ mobile = false }) => (

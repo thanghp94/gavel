@@ -15,6 +15,7 @@ import {
   teams,
   teamMembers,
   tasks,
+  announcements,
   type User,
   type InsertUser,
   type Meeting,
@@ -122,6 +123,26 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  // Announcement methods
+  async getAnnouncements() {
+    return await db.select().from(announcements).orderBy(desc(announcements.createdAt));
+  }
+
+  async createAnnouncement(announcement: { title: string; content: string; status?: string; createdBy: string }) {
+    const result = await db.insert(announcements).values(announcement).returning();
+    return result[0];
+  }
+
+  async updateAnnouncement(id: string, updates: Partial<{ title: string; content: string; status: string }>) {
+    const result = await db.update(announcements).set(updates).where(eq(announcements.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteAnnouncement(id: string) {
+    const result = await db.delete(announcements).where(eq(announcements.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
   async getUserByEmail(email: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
     return result[0];
@@ -168,7 +189,8 @@ export class DatabaseStorage implements IStorage {
 
   // Meeting methods
   async getMeetings(): Promise<Meeting[]> {
-    return await db.select().from(meetings).orderBy(asc(meetings.date));
+    const today = new Date().toISOString().split('T')[0];
+    return await db.select().from(meetings).where(sql`${meetings.date} >= ${today}`).orderBy(asc(meetings.date));
   }
 
   async getMeeting(id: string): Promise<Meeting | undefined> {
@@ -217,16 +239,22 @@ export class DatabaseStorage implements IStorage {
     const results = await db
       .select({
         id: reflections.id,
+        userId: reflections.userId,
         meetingId: reflections.meetingId,
-        content: reflections.content,
-        createdAt: reflections.createdAt,
+        nameInput: reflections.nameInput,
+        q1: reflections.q1,
+        q2: reflections.q2,
+        q3: reflections.q3,
+        q4: reflections.q4,
+        q5: reflections.q5,
+        submittedAt: reflections.submittedAt,
         meetingTitle: meetings.title,
         meetingDate: meetings.date
       })
       .from(reflections)
       .innerJoin(meetings, eq(reflections.meetingId, meetings.id))
       .where(eq(reflections.userId, userId))
-      .orderBy(desc(reflections.createdAt));
+      .orderBy(desc(reflections.submittedAt));
 
     return results;
   }
@@ -238,8 +266,13 @@ export class DatabaseStorage implements IStorage {
           id: reflections.id,
           meetingId: reflections.meetingId,
           userId: reflections.userId,
-          content: reflections.content,
-          createdAt: reflections.createdAt,
+          nameInput: reflections.nameInput,
+          q1: reflections.q1,
+          q2: reflections.q2,
+          q3: reflections.q3,
+          q4: reflections.q4,
+          q5: reflections.q5,
+          submittedAt: reflections.submittedAt,
           meetingTitle: meetings.title,
           meetingDate: meetings.date,
           userDisplayName: users.displayName
@@ -247,7 +280,7 @@ export class DatabaseStorage implements IStorage {
         .from(reflections)
         .innerJoin(meetings, eq(reflections.meetingId, meetings.id))
         .innerJoin(users, eq(reflections.userId, users.id))
-        .orderBy(desc(reflections.createdAt));
+        .orderBy(desc(reflections.submittedAt));
 
       return results;
     } catch (error) {
@@ -461,8 +494,8 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async deleteTask(id: string): Promise<boolean> {
-    const result = await db.delete(tasks).where(eq(tasks.id, id));
+  async deleteTeam(id: string): Promise<boolean> {
+    const result = await db.delete(teams).where(eq(teams.id, id));
     return (result.rowCount || 0) > 0;
   }
 

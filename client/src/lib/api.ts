@@ -268,6 +268,24 @@ class ApiClient {
   logout() {
     localStorage.removeItem('authToken');
   }
+
+  async getAnnouncements() {
+    return this.request<any[]>('/announcements');
+  }
+
+  async createAnnouncement(announcement: { title: string; content: string; status: string }) {
+    return this.request('/announcements', {
+      method: 'POST',
+      body: JSON.stringify(announcement),
+    });
+  }
+
+  async updateAnnouncement(id: string, announcement: { title: string; content: string; status: string }) {
+    return this.request(`/announcements/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(announcement),
+    });
+  }
 }
 
 export const api = new ApiClient();

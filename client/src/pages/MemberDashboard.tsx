@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, BookOpen, TrendingUp, MessageSquare, User, Clock, Award, Edit } from "lucide-react";
 import { MemberNavigation } from "@/components/navigation/MemberNavigation";
 import { MeetingRegistrationDialog } from "@/components/MeetingRegistrationDialog";
@@ -51,8 +52,11 @@ interface User {
 const MemberDashboard = () => {
   const [memberData, setMemberData] = useState<User | null>(null);
   const [upcomingMeetings, setUpcomingMeetings] = useState<MeetingWithRegistration[]>([]);
+  const [pastMeetings, setPastMeetings] = useState<MeetingWithRegistration[]>([]);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [filteredAnnouncements, setFilteredAnnouncements] = useState<any[]>([]); // This state is no longer strictly necessary if filtering inline
   const [loading, setLoading] = useState(true);
-  const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [reflections, setReflections] = useState<Reflection[]>([]);// Fixed reflection type
   const [roles, setRoles] = useState<Role[]>([]);
   const [registrationDialog, setRegistrationDialog] = useState<{
     isOpen: boolean;
@@ -67,29 +71,43 @@ const MemberDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [user, meetings, rolesData] = await Promise.all([
+        const [user, meetings, rolesData, announcementsData] = await Promise.all([
           api.getCurrentUser(),
           api.getMeetings(),
-          api.getRoles()
+          api.getRoles(),
+          api.getAnnouncements()
         ]);
 
         setMemberData(user);
         setRoles(rolesData);
-        
-        // Filter upcoming meetings and limit to 2
-        const upcoming = meetings
-          .filter(m => m.status === 'upcoming')
-          .slice(0, 2);
+        setAnnouncements(announcementsData);
+        setFilteredAnnouncements(announcementsData); // Still setting it, but not used in the final Announcements render anymore
 
-        // Fetch registration status for each upcoming meeting
-        const meetingsWithRegistration = await Promise.all(
+        // Filter upcoming and past meetings
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const upcoming = meetings.filter(m => {
+          const meetingDate = new Date(m.date);
+          meetingDate.setHours(0, 0, 0, 0);
+          return meetingDate >= today;
+        }).slice(0, 3);
+
+        const past = meetings.filter(m => {
+          const meetingDate = new Date(m.date);
+          meetingDate.setHours(0, 0, 0, 0);
+          return meetingDate < today && m.status === 'completed';
+        }).slice(0, 3);
+
+
+        const upcomingWithRegistration = await Promise.all(
           upcoming.map(async (meeting) => {
             try {
               const registration = await api.getMyMeetingRegistration(meeting.id) as Registration;
-              const role = registration?.roleId 
+              const role = registration?.roleId
                 ? rolesData.find(r => r.id === registration.roleId)
                 : null;
-              
+
               return {
                 ...meeting,
                 registration,
@@ -107,11 +125,39 @@ const MemberDashboard = () => {
           })
         );
 
-        setUpcomingMeetings(meetingsWithRegistration);
-        
+        const pastWithRegistration = await Promise.all(
+          past.map(async (meeting) => {
+            try {
+              const registration = await api.getMyMeetingRegistration(meeting.id) as Registration;
+              const role = registration?.roleId
+                ? rolesData.find(r => r.id === registration.roleId)
+                : null;
+
+              return {
+                ...meeting,
+                registration,
+                role: role?.name || null,
+                isRegistered: !!registration
+              };
+            } catch (error) {
+              return {
+                ...meeting,
+                registration: null,
+                role: null,
+                isRegistered: false
+              };
+            }
+          })
+        );
+
+        setUpcomingMeetings(upcomingWithRegistration);
+        setPastMeetings(pastWithRegistration);
+
         // Set some sample reflections since the API method doesn't exist yet
         setReflections([
-          { id: 1, meetingTitle: "Sample Meeting", date: "2024-01-15", status: "Completed" }
+          { id: 1, meetingTitle: "Sample Meeting 1", date: "2024-06-20", status: "Completed" },
+          { id: 2, meetingTitle: "Sample Meeting 2", date: "2024-06-10", status: "Completed" },
+          { id: 3, meetingTitle: "Sample Meeting 3", date: "2024-05-30", status: "Completed" },
         ]);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -126,18 +172,31 @@ const MemberDashboard = () => {
   const refreshMeetingsData = async () => {
     try {
       const meetings = await api.getMeetings();
-      const upcoming = meetings
-        .filter((m: any) => m.status === 'upcoming')
-        .slice(0, 2);
+      // Re-apply the same date filtering and slicing as in fetchData
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-      const meetingsWithRegistration = await Promise.all(
+      const upcoming = meetings.filter((m: any) => {
+        const meetingDate = new Date(m.date);
+        meetingDate.setHours(0, 0, 0, 0);
+        return meetingDate >= today;
+      }).slice(0, 3);
+
+      const past = meetings.filter((m: any) => {
+        const meetingDate = new Date(m.date);
+        meetingDate.setHours(0, 0, 0, 0);
+        return meetingDate < today && m.status === 'completed';
+      }).slice(0, 3);
+
+
+      const upcomingWithRegistration = await Promise.all(
         upcoming.map(async (meeting: any) => {
           try {
             const registration = await api.getMyMeetingRegistration(meeting.id) as Registration;
-            const role = registration?.roleId 
+            const role = registration?.roleId
               ? roles.find(r => r.id === registration.roleId)
               : null;
-            
+
             return {
               ...meeting,
               registration,
@@ -155,7 +214,33 @@ const MemberDashboard = () => {
         })
       );
 
-      setUpcomingMeetings(meetingsWithRegistration);
+      const pastWithRegistration = await Promise.all(
+        past.map(async (meeting: any) => {
+          try {
+            const registration = await api.getMyMeetingRegistration(meeting.id) as Registration;
+            const role = registration?.roleId
+              ? roles.find(r => r.id === registration.roleId)
+              : null;
+
+            return {
+              ...meeting,
+              registration,
+              role: role?.name || null,
+              isRegistered: !!registration
+            };
+          } catch (error) {
+            return {
+              ...meeting,
+              registration: null,
+              role: null,
+              isRegistered: false
+            };
+          }
+        })
+      );
+
+      setUpcomingMeetings(upcomingWithRegistration);
+      setPastMeetings(pastWithRegistration);
     } catch (error) {
       console.error('Failed to refresh meetings data:', error);
     }
@@ -248,86 +333,179 @@ const MemberDashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Upcoming Meetings */}
+        {/* New Grid for Meetings and Announcements (Row 1) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Meetings - First Column, First Row */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-blue-600" />
-                Upcoming Meetings
-              </CardTitle>
-              <CardDescription>
-                Your assigned roles and meeting details
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {upcomingMeetings.map((meeting) => (
-                <div key={meeting.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold text-gray-900">{meeting.title}</h4>
-                    {meeting.isRegistered && meeting.role ? (
-                      <Badge variant="default">{meeting.role}</Badge>
-                    ) : (
-                      <Badge variant="secondary">Not Registered</Badge>
-                    )}
+            <CardContent className="p-0">
+              <Tabs defaultValue="upcoming" className="w-full">
+                <div className="flex items-center justify-between p-6 pb-0">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <h3 className="text-lg font-semibold">Meetings</h3>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {meeting.date}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {meeting.time}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3">Theme: {meeting.theme}</p>
-                  
-                  {meeting.isRegistered ? (
-                    <div className="space-y-2">
-                      {meeting.role && meeting.role !== "Guest" && meeting.role !== "No Role" ? (
-                        <Button size="sm" variant="outline" className="w-full">
-                          <BookOpen className="h-4 w-4 mr-2" />
-                          View Role Guidelines
-                        </Button>
-                      ) : (
-                        <div className="text-sm text-gray-600 text-center py-2">
-                          {meeting.role === "Guest" ? "Registered as Guest" : "No specific role assigned"}
+                  <TabsList className="grid grid-cols-2 w-48">
+                    <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                    <TabsTrigger value="past">Past</TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <div className="p-6 pt-4">
+                  <TabsContent value="upcoming" className="space-y-4 mt-0">
+                    {upcomingMeetings.map((meeting) => (
+                      <div key={meeting.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-between">
+                        <div className="flex-1 min-w-0 pr-4">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="font-semibold text-gray-900 truncate">{meeting.title}</h4>
+                            {meeting.isRegistered && meeting.role ? (
+                              <Badge variant="default" className="ml-2 flex-shrink-0">{meeting.role}</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="ml-2 flex-shrink-0">Not Registered</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-1">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {meeting.date}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {meeting.time}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 truncate">Theme: {meeting.theme}</p>
+                          {meeting.isRegistered && (
+                            <>
+                              {meeting.role === "Guest" ? (
+                                <p className="text-xs text-gray-500 mt-1">Registered as Guest</p>
+                              ) : meeting.role === "No Role" ? (
+                                <p className="text-xs text-gray-500 mt-1">No specific role assigned</p>
+                              ) : null}
+                            </>
+                          )}
                         </div>
-                      )}
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => handleOpenRegistrationDialog(meeting, true)}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Change Role
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      size="sm" 
-                      className="w-full"
-                      onClick={() => handleOpenRegistrationDialog(meeting, false)}
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      Register for Meeting
-                    </Button>
-                  )}
+
+                        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 ml-4">
+                          {meeting.isRegistered ? (
+                            <>
+                              {meeting.role && meeting.role !== "Guest" && meeting.role !== "No Role" && (
+                                <Button size="sm" variant="outline" className="flex-shrink-0">
+                                  <BookOpen className="h-4 w-4 mr-1" />
+                                  Guidelines
+                                </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex-shrink-0"
+                                onClick={() => handleOpenRegistrationDialog(meeting, true)}
+                              >
+                                <Edit className="h-4 w-4 mr-1" />
+                                Change Role
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              size="sm"
+                              className="flex-shrink-0"
+                              onClick={() => handleOpenRegistrationDialog(meeting, false)}
+                            >
+                              <User className="h-4 w-4 mr-1" />
+                              Register
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {upcomingMeetings.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <p>No upcoming meetings scheduled</p>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="past" className="space-y-4 mt-0">
+                    {pastMeetings.map((meeting) => (
+                      <div key={meeting.id} className="p-4 border rounded-lg bg-gray-50 flex items-center justify-between">
+                        <div className="flex-1 min-w-0 pr-4">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="font-semibold text-gray-900 truncate">{meeting.title}</h4>
+                            {meeting.isRegistered && meeting.role ? (
+                              <Badge variant="outline" className="ml-2 flex-shrink-0">{meeting.role}</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="ml-2 flex-shrink-0">Not Attended</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-1">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {meeting.date}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {meeting.time}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 truncate">Theme: {meeting.theme}</p>
+                        </div>
+
+                        {meeting.isRegistered && (
+                          <div className="flex-shrink-0 ml-4">
+                            <Button size="sm" variant="outline">
+                              <MessageSquare className="h-4 w-4 mr-1" />
+                              Reflection
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {pastMeetings.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <p>No past meetings found</p>
+                      </div>
+                    )}
+                  </TabsContent>
                 </div>
-              ))}
-              
-              {upcomingMeetings.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>No upcoming meetings scheduled</p>
-                </div>
-              )}
+              </Tabs>
             </CardContent>
           </Card>
 
-          {/* Progress & Learning */}
+          {/* Recent Announcements - Second Column, First Row */}
+          <Card>
+            <CardHeader className="flex items-center justify-between">
+              <CardTitle>Recent Announcements</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 mt-0 max-h-96 overflow-y-auto">
+                {announcements
+                  .filter(a => a.status === "published")
+                  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  .slice(0, 4)
+                  .map((announcement) => (
+                    <div key={announcement.id} className="border rounded p-3">
+                      <h4 className="font-semibold">{announcement.title}</h4>
+                      <p className="text-sm text-gray-700">{announcement.content}</p>
+                      <p className="text-xs text-gray-500 mt-1 text-right">
+                        Posted on {new Date(announcement.createdAt).toLocaleDateString('en-GB')}
+                      </p>
+                    </div>
+                  ))}
+                {announcements.filter(a => a.status === "published").length === 0 && (
+                  <p className="text-gray-500 text-center">No announcements to display.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div> {/* End of the first row grid */}
+
+
+        {/* New Grid for Progress & Learning, Recent Reflections, Quick Actions (Row 2 onwards) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Progress & Learning - First Column */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -376,7 +554,7 @@ const MemberDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Reflections */}
+          {/* Recent Reflections - Second Column */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -405,8 +583,11 @@ const MemberDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <Card>
+          {/* Quick Actions - Can be its own row or part of a new grid below these two */}
+          {/* If you want Quick Actions to be below Learning Progress and Recent Reflections,
+              you might need another grid or let it span columns.
+              For now, I'll place it as a full-width item below the current 2-col grid. */}
+          <Card className="lg:col-span-2"> {/* Make Quick Actions span both columns */}
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
               <CardDescription>
@@ -432,7 +613,7 @@ const MemberDashboard = () => {
               </Button>
             </CardContent>
           </Card>
-        </div>
+        </div> {/* End of the second row grid */}
       </main>
 
       {/* Meeting Registration Dialog */}

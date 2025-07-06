@@ -24,6 +24,7 @@ import { ExcoNavigation } from "@/components/navigation/ExcoNavigation";
 import { MeetingDetailsDialog } from "@/components/MeetingDetailsDialog";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import ExcoAnnouncements from "./ExcoAnnouncements";
 
 const ExcoDashboard = () => {
   const [dashboardStats, setDashboardStats] = useState({
@@ -563,6 +564,26 @@ const ExcoDashboard = () => {
           }}
         />
       )}
+      {/* Announcements Dialog */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition-colors">
+            Announcements
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Announcements</DialogTitle>
+            <DialogDescription>
+              Manage and view announcements
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4">
+            {/* Render the ExcoAnnouncements component here */}
+            <ExcoAnnouncements />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
